@@ -10,15 +10,18 @@
         body { font-family: 'Montserrat', sans-serif; background-color: #0A0F1A; color: #F8FAFC; overflow-x: hidden; }
         .hidden { display: none; }
         
+        /* Grises sutiles para categorías */
         .card-gray-1 { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); }
         .card-gray-2 { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.03); }
         
         .btn-xl { padding: 24px; border-radius: 24px; font-size: 16px; font-weight: 900; letter-spacing: 1px; }
         
+        /* Ventana Tendencias Difuminada */
         .modal-blur { background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
         .btn-trends { background: rgba(255, 255, 255, 0.05); color: #94A3B8; border: 1px solid rgba(255, 255, 255, 0.1); }
         .bar-gray { background: #475569; }
 
+        /* Podio y Slots */
         .podium-slot { height: 85px; border-radius: 22px; display: flex; align-items: center; padding: 0 25px; border: 1px solid rgba(255,255,255,0.08); text-transform: uppercase; font-weight: 900; font-size: 15px; margin-bottom: 12px; }
         .slot-empty { background: rgba(255, 255, 255, 0.02); color: #475569; border-style: dashed; }
         .slot-filled { background: #1E293B; color: white; border-color: #64748B; }
@@ -26,10 +29,11 @@
         .band-card { background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; }
         .band-selected { opacity: 0.1; filter: grayscale(1); pointer-events: none; }
         
+        /* Botón Salir */
         .btn-salir { background: #7F1D1D; color: #FEE2E2; border: 1px solid #B91C1C; padding: 12px 24px; border-radius: 18px; font-weight: 900; font-size: 12px; transition: all 0.2s; }
         .btn-salir:active { background: #991B1B; transform: scale(0.95); }
 
-        .btn-delete { color: #F87171; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; display: inline-block; opacity: 0.6; }
+        .btn-delete { color: #F87171; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; display: inline-block; opacity: 0.7; }
     </style>
 </head>
 <body class="antialiased">
@@ -82,13 +86,13 @@
 
     <div id="modal-trends" class="hidden fixed inset-0 modal-blur z-[60] p-10 flex flex-col items-center justify-center">
         <h3 class="text-3xl font-black text-white uppercase mb-2 tracking-tighter">TENDENCIAS</h3>
-        <p id="trends-cat-name" class="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mb-14 text-center">---</p>
-        <div id="trends-list" class="w-full max-w-sm space-y-8 overflow-y-auto max-h-[50vh] pr-2"></div>
-        <button onclick="closeTrends()" class="mt-16 text-xs font-black text-slate-400 uppercase tracking-widest border border-white/10 px-12 py-6 rounded-3xl active:bg-white/10">CERRAR VENTANA</button>
+        <p id="trends-cat-name" class="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mb-14 text-center">TOP 2 SELECCIONADOS</p>
+        <div id="trends-list" class="w-full max-w-sm space-y-8"></div>
+        <button onclick="closeTrends()" class="mt-16 text-xs font-black text-slate-400 uppercase tracking-widest border border-white/10 px-12 py-6 rounded-3xl">CERRAR VENTANA</button>
     </div>
 
     <script>
-        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbxCjPEEqvZvmxcCGeG8BU4gG2YcYoXf-29R1Reyoo4KCtqPktFj1lyUvorPsl4YSGRj/exec";
+        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbz1eHvFWIbUVgnBJQ88H_K3dSIl4EnueuDXNxylrkvTpx39PtOQjvWAbaYUeivswQc3/exec";
         let session = { usuario: "", nombre: "", bandas: [], misApuestas: [] };
         let currentBet = [];
         let selectedCategory = "";
@@ -112,7 +116,7 @@
                     localStorage.setItem('podium_v2', JSON.stringify(session));
                     document.getElementById('user-display').innerText = session.nombre;
                     await cargarDatos(); nav('screen-menu');
-                } else { alert("ERROR"); b.innerText = "INGRESAR"; }
+                } else { alert("ACCESO DENEGADO"); b.innerText = "INGRESAR"; }
             } catch (e) { alert("ERROR RED"); b.innerText = "INGRESAR"; }
         }
 
@@ -132,12 +136,12 @@
             cats.forEach((cat, index) => {
                 const apuestaPrevia = session.misApuestas.find(a => a.categoria === cat);
                 const card = document.createElement('div');
-                card.className = `${index % 2 === 0 ? 'card-gray-1' : 'card-gray-2'} p-10 rounded-[45px] text-center shadow-xl`;
+                card.className = `${index % 2 === 0 ? 'card-gray-1' : 'card-gray-2'} p-10 rounded-[45px] text-center`;
                 let html = `<h4 class="font-black text-white uppercase text-xl mb-6 tracking-tighter">${cat}</h4>`;
                 if(apuestaPrevia) {
                     html += `<div class="bg-black/40 p-6 rounded-3xl mb-8 border border-white/5">
-                                <p class="text-[9px] text-slate-500 font-black mb-3 uppercase tracking-widest">TU ELECCIÓN:</p>
-                                <p class="text-xs text-slate-300 font-bold uppercase leading-relaxed">${apuestaPrevia.p1}<br>${apuestaPrevia.p2}<br>${apuestaPrevia.p3}</p>
+                                <p class="text-[9px] text-slate-500 font-black mb-3 uppercase tracking-widest text-center">TU PODIO:</p>
+                                <p class="text-xs text-slate-300 font-bold uppercase leading-relaxed text-center">${apuestaPrevia.p1}<br>${apuestaPrevia.p2}<br>${apuestaPrevia.p3}</p>
                              </div>
                              <div class="space-y-4">
                                 <button onclick="abrirCategoria('${cat}')" class="w-full bg-white/5 text-white p-6 rounded-2xl font-black text-xs uppercase border border-white/10">EDITAR PODIUM</button>
@@ -199,11 +203,12 @@
         }
 
         async function cancelarApuesta(cat) {
-            if(!confirm("¿ESTÁS SEGURO DE ELIMINAR ESTA APUESTA?")) return;
+            if(!confirm("¿CONFIRMAS LA ELIMINACIÓN TOTAL DE ESTA APUESTA?")) return;
             toggleLoader(true);
             try {
-                await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "cancelar", usuario: session.usuario, categoria: cat }) });
-                await cargarDatos();
+                const r = await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "cancelar", usuario: session.usuario, categoria: cat }) });
+                const d = await r.json();
+                if(d.success) { await cargarDatos(); }
             } catch (e) { alert("ERROR AL ELIMINAR"); }
             toggleLoader(false);
         }
@@ -215,16 +220,15 @@
                 const d = await r.json();
                 const list = document.getElementById('trends-list');
                 const total = d.tendencias.reduce((acc, c) => acc + c.votos, 0);
-                list.innerHTML = d.tendencias.map(t => {
-                    const pct = ((t.votos / total) * 100).toFixed(0);
+                list.innerHTML = d.tendencias.length > 0 ? d.tendencias.map(t => {
+                    const pct = total > 0 ? ((t.votos / total) * 100).toFixed(0) : 0;
                     return `<div>
                                 <div class="flex justify-between mb-3"><span class="text-xs font-black uppercase text-slate-300">${t.nombre}</span><span class="text-slate-500 font-black text-xs">${pct}%</span></div>
                                 <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden"><div class="bar-gray h-full rounded-full" style="width: ${pct}%"></div></div>
                             </div>`;
-                }).join('');
-                document.getElementById('trends-cat-name').innerText = cat;
+                }).join('') : `<p class="text-slate-600 text-[10px] font-bold uppercase tracking-widest text-center">SIN DATOS SUFICIENTES</p>`;
                 document.getElementById('modal-trends').classList.remove('hidden');
-            } catch (e) { alert("ERROR"); }
+            } catch (e) { alert("ERROR TENDENCIAS"); }
             toggleLoader(false);
         }
 
