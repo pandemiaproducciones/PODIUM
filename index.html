@@ -24,10 +24,9 @@
         .band-card { background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; padding: 18px !important; }
         .band-selected { opacity: 0.1; filter: grayscale(1); pointer-events: none; }
         
-        .btn-salir { background: #7F1D1D; color: #FEE2E2; border: 1px solid #B91C1C; padding: 12px 24px; border-radius: 18px; font-weight: 900; font-size: 13px; transition: all 0.2s; }
+        .btn-salir { background: #7F1D1D; color: #FEE2E2; border: 1px solid #B91C1C; padding: 12px 24px; border-radius: 18px; font-weight: 900; font-size: 13px; }
         .btn-delete { color: #F87171; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; display: inline-block; opacity: 0.8; }
         
-        /* Panel de Estadísticas con Proporción 35/65 */
         .stats-panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 35px; padding: 25px; display: flex; align-items: center; margin-bottom: 30px; }
     </style>
 </head>
@@ -67,7 +66,7 @@
             </div>
             <div class="text-center pl-6 w-[65%]">
                 <p id="count-pozo" class="text-3xl font-black text-white">$0</p>
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">POZO ACUMULADO</p>
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">POZO GLOBAL</p>
             </div>
         </div>
 
@@ -99,8 +98,8 @@
     </div>
 
     <script>
-        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbz1eHvFWIbUVgnBJQ88H_K3dSIl4EnueuDXNxylrkvTpx39PtOQjvWAbaYUeivswQc3/exec";
-        let session = { usuario: "", nombre: "", bandas: [], misApuestas: [] };
+        const MOTOR_URL = "https://script.google.com/macros/s/AKfycby_wcq8sQyShMYMN9hVuRByMEpsqFuxhj7N5k2AzPYcBvZDBY-kXfNGcxBlHFAcifpE/exec";
+        let session = { usuario: "", nombre: "", bandas: [], misApuestas: [], rawApuestas: [] };
         let currentBet = [];
         let selectedCategory = "";
 
@@ -112,9 +111,8 @@
         async function login() {
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
-            const b = document.getElementById('btn-login');
             if(!u || !p) return;
-            b.innerText = "VERIFICANDO...";
+            toggleLoader(true);
             try {
                 const r = await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "login", user: u, pass: p }) });
                 const d = await r.json();
@@ -123,17 +121,19 @@
                     localStorage.setItem('podium_v2', JSON.stringify(session));
                     document.getElementById('user-display').innerText = session.nombre;
                     await cargarDatos(); nav('screen-menu');
-                } else { alert("ERROR"); b.innerText = "INGRESAR"; }
-            } catch (e) { alert("ERROR RED"); b.innerText = "INGRESAR"; }
+                } else { alert("USUARIO O CLAVE INCORRECTA"); }
+            } catch (e) { alert("ERROR DE CONEXIÓN"); }
+            toggleLoader(false);
         }
 
         async function cargarDatos() {
             try {
                 const r = await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "getDatos", usuario: session.usuario }) });
                 const d = await r.json();
-                session.bandas = d.bandas; session.misApuestas = d.misApuestas;
-                
-                // Actualizar Panel de Pozo
+                session.bandas = d.bandas; 
+                session.misApuestas = d.misApuestas;
+                session.rawApuestas = d.rawApuestas || []; // Todas para calcular pozos locales
+
                 document.getElementById('count-users').innerText = d.totalParticipantes || 0;
                 document.getElementById('count-pozo').innerText = "$" + (d.totalPozo || 0).toLocaleString();
                 
@@ -145,43 +145,57 @@
             const container = document.getElementById('categories-container');
             container.innerHTML = "";
             const cats = [...new Set(session.bandas.map(b => b.nivel))];
+            
             cats.forEach((cat, index) => {
-                const apuesta = session.misApuestas.find(a => a.categoria === cat);
+                const miApuesta = session.misApuestas.find(a => a.categoria === cat);
+                
+                // Cálculo de pozo local
+                const localBets = session.rawApuestas ? session.rawApuestas.filter(a => a[2] === cat) : [];
+                const localPozo = localBets.reduce((acc, a) => acc + (parseFloat(a[6]) || 0), 0);
+                const localUsers = localBets.length;
+
                 const card = document.createElement('div');
                 card.className = `${index % 2 === 0 ? 'card-gray-1' : 'card-gray-2'} rounded-[40px] text-center`;
-                let html = `<h4 class="font-black text-white uppercase text-2xl mb-6 tracking-tighter">${cat}</h4>`;
                 
-                if(apuesta) {
-                    const edits = parseInt(apuesta.ediciones || 0);
-                    html += `<div class="bg-black/40 p-5 rounded-3xl mb-6 border border-white/5">
-                                <p class="text-[10px] text-slate-500 font-black mb-3 uppercase tracking-widest text-center">TU PODIO (FONDO: $${apuesta.monto}):</p>
-                                <p class="text-sm text-slate-300 font-bold uppercase leading-relaxed text-center">${apuesta.p1}<br>${apuesta.p2}<br>${apuesta.p3}</p>
-                             </div>
-                             <div class="space-y-4">`;
-                    
+                let html = `
+                    <h4 class="font-black text-white uppercase text-2xl mb-1 tracking-tighter">${cat}</h4>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">${localUsers} PARTICIPANTES | POZO: $${localPozo.toLocaleString()}</p>
+                `;
+                
+                if(miApuesta) {
+                    const edits = parseInt(miApuesta.ediciones || 0);
+                    const statusColor = miApuesta.estatus === 'activo' ? 'text-green-500' : 'text-amber-500';
+                    html += `
+                        <div class="bg-black/40 p-5 rounded-3xl mb-6 border border-white/5">
+                            <p class="text-[9px] font-black uppercase tracking-widest mb-2 ${statusColor}">ESTADO: ${miApuesta.estatus}</p>
+                            <p class="text-[10px] text-slate-500 font-black mb-3 uppercase tracking-widest text-center">TU PODIO (FONDO: $${miApuesta.monto.toLocaleString()}):</p>
+                            <p class="text-sm text-slate-300 font-bold uppercase leading-relaxed text-center">${miApuesta.p1}<br>${miApuesta.p2}<br>${miApuesta.p3}</p>
+                        </div>
+                        <div class="space-y-4">
+                    `;
                     if(edits < 3) {
-                        html += `<button onclick="confirmarEdicion('${cat}', ${edits})" class="w-full bg-white/5 text-white p-5 rounded-2xl font-black text-sm uppercase border border-white/10">EDITAR PODIUM</button>`;
+                        html += `<button onclick="confirmarEdicion('${cat}', ${edits})" class="w-full bg-white/5 text-white p-5 rounded-2xl font-black text-sm uppercase border border-white/10">EDITAR ESTRATEGIA</button>`;
                     } else {
-                        html += `<p class="text-[9px] font-black text-red-500 uppercase">PODIUM BLINDADO (SIN CAMBIOS)</p>`;
+                        html += `<p class="text-[9px] font-black text-red-500 uppercase">PODIUM BLINDADO</p>`;
                     }
-                    
-                    html += `<button onclick="verTendencias('${cat}')" class="w-full btn-trends p-5 rounded-2xl font-black uppercase">VER TENDENCIAS</button>
-                             <button onclick="cancelarApuesta('${cat}')" class="btn-delete">ELIMINAR APUESTA</button>
-                             </div>`;
+                    html += `
+                        <button onclick="verTendencias('${cat}')" class="w-full btn-trends p-5 rounded-2xl font-black uppercase">VER TENDENCIAS</button>
+                        <button onclick="cancelarApuesta('${cat}')" class="btn-delete">ELIMINAR APUESTA</button>
+                        </div>
+                    `;
                 } else {
-                    html += `<button onclick="abrirCategoria('${cat}')" class="w-full bg-white text-slate-950 p-6 rounded-2xl font-black text-sm uppercase">APOSTAR</button>`;
+                    html += `<button onclick="abrirCategoria('${cat}')" class="w-full bg-white text-slate-950 p-6 rounded-2xl font-black text-sm uppercase">ACTIVAR APUESTA</button>`;
                 }
                 card.innerHTML = html; container.appendChild(card);
             });
         }
 
         function confirmarEdicion(cat, edits) {
-            let mensaje = "";
-            if(edits === 0) mensaje = "¿Confirmar actualización de estrategia?\nEsta gestión tiene un costo operativo de $1.000. Tu fondo disponible para el premio final se ajustará a $18.000. Te quedarán 2 cambios disponibles.";
-            if(edits === 1) mensaje = "¿Confirmar nueva gestión de datos?\nPara procesar este segundo cambio, se aplicará un costo de mantenimiento de $1.000. Tu fondo en juego será de $17.000. Te quedará 1 último cambio disponible.";
-            if(edits === 2) mensaje = "¿Confirmar última actualización disponible?\nEste ajuste final de datos tiene un costo operativo de $1.000. Tu fondo definitivo para el pozo será de $16.000. Tras esta acción, tu Podium quedará blindado.";
-            
-            if(confirm(mensaje)) { abrirCategoria(cat); }
+            let msg = "";
+            if(edits === 0) msg = "¿Confirmar actualización de estrategia?\nEsta gestión tiene un costo operativo de $1.000. Tu fondo disponible para el premio final se ajustará a $18.000. Te quedarán 2 cambios disponibles.";
+            if(edits === 1) msg = "¿Confirmar nueva gestión de datos?\nPara procesar este segundo cambio, se aplicará un costo de mantenimiento de $1.000. Tu fondo en juego será de $17.000. Te quedará 1 último cambio disponible.";
+            if(edits === 2) msg = "¿Confirmar última actualización disponible?\nEste ajuste final de datos tiene un costo operativo de $1.000. Tu fondo definitivo para el pozo será de $16.000. Tras esta acción, tu Podium quedará blindado.";
+            if(confirm(msg)) abrirCategoria(cat);
         }
 
         function abrirCategoria(cat) {
@@ -227,7 +241,7 @@
             try {
                 await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "apostar", usuario: session.usuario, categoria: selectedCategory, p1: currentBet[0], p2: currentBet[1], p3: currentBet[2] }) });
                 await cargarDatos(); nav('screen-menu');
-            } catch (e) { alert("ERROR"); }
+            } catch (e) { alert("ERROR AL GUARDAR"); }
             toggleLoader(false);
         }
 
@@ -252,9 +266,9 @@
                     const pct = total > 0 ? ((t.votos / total) * 100).toFixed(0) : 0;
                     return `<div>
                                 <div class="flex justify-between mb-4"><span class="text-base font-black uppercase text-slate-300">${t.nombre}</span><span class="text-slate-500 font-black text-sm">${pct}%</span></div>
-                                <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden"><div class="bar-gray h-full rounded-full" style="width: ${pct}%"></div></div>
+                                <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden"><div class="bg-slate-500 h-full rounded-full" style="width: ${pct}%"></div></div>
                             </div>`;
-                }).join('') : `<p class="text-slate-600 text-[12px] font-bold uppercase text-center">SIN DATOS</p>`;
+                }).join('') : `<p class="text-slate-600 text-xs font-bold uppercase text-center">SIN DATOS</p>`;
                 document.getElementById('modal-trends').classList.remove('hidden');
             } catch (e) { alert("ERROR"); }
             toggleLoader(false);
