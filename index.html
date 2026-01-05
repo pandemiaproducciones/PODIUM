@@ -26,8 +26,8 @@
         .band-card { background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; }
         .band-selected { opacity: 0.1; filter: grayscale(1); pointer-events: none; }
         
-        .btn-salir { background: #7F1D1D; color: #FEE2E2; border: 1px solid #B91C1C; padding: 12px 24px; border-radius: 18px; font-weight: 900; font-size: 12px; transition: all 0.2s; }
-        .btn-salir:active { background: #991B1B; transform: scale(0.95); }
+        .btn-salir { background: #7F1D1D; color: #FEE2E2; border: 1px solid #B91C1C; padding: 12px 24px; border-radius: 18px; font-weight: 900; font-size: 12px; }
+        .btn-eliminar { color: #EF4444; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-top: 20px; display: block; width: 100%; text-align: center; opacity: 0.7; }
     </style>
 </head>
 <body class="antialiased">
@@ -44,7 +44,7 @@
             <div class="space-y-5">
                 <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-6 bg-white/5 border border-white/10 rounded-3xl outline-none text-center font-black text-lg uppercase text-white">
                 <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-6 bg-white/5 border border-white/10 rounded-3xl outline-none text-center text-2xl tracking-widest font-black text-white">
-                <button id="btn-login" onclick="login()" class="w-full bg-white text-slate-950 btn-xl uppercase mt-6">INGRESAR</button>
+                <button onclick="login()" class="w-full bg-white text-slate-950 btn-xl uppercase mt-6">INGRESAR</button>
             </div>
         </div>
     </div>
@@ -56,9 +56,8 @@
                 <h2 class="text-4xl font-black text-white uppercase tracking-tighter">PODIUM</h2>
                 <p id="user-display" class="text-slate-400 font-bold text-sm uppercase">---</p>
             </div>
-            <button onclick="logout()" class="btn-salir uppercase">SALIR</button>
+            <button onclick="logout()" class="btn-salir uppercase shadow-lg shadow-red-950/40">SALIR</button>
         </div>
-        <p class="font-black text-slate-700 text-[11px] uppercase mb-8 tracking-[0.3em] text-center">CATEGORÍAS ACTIVAS</p>
         <div id="categories-container" class="space-y-6"></div>
     </div>
 
@@ -82,11 +81,11 @@
         <h3 class="text-3xl font-black text-white uppercase mb-2 tracking-tighter">TENDENCIAS</h3>
         <p id="trends-cat-name" class="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mb-14 text-center">---</p>
         <div id="trends-list" class="w-full max-w-sm space-y-8 overflow-y-auto max-h-[50vh] pr-2"></div>
-        <button onclick="closeTrends()" class="mt-16 text-xs font-black text-slate-400 uppercase tracking-widest border border-white/10 px-12 py-6 rounded-3xl active:bg-white/10">CERRAR VENTANA</button>
+        <button onclick="closeTrends()" class="mt-16 text-xs font-black text-slate-400 uppercase tracking-widest border border-white/10 px-12 py-6 rounded-3xl">CERRAR VENTANA</button>
     </div>
 
     <script>
-        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbxCjPEEqvZvmxcCGeG8BU4gG2YcYoXf-29R1Reyoo4KCtqPktFj1lyUvorPsl4YSGRj/exec";
+        const MOTOR_URL = "https://script.google.com/macros/s/AKfycbw8-sNhl3nXft_pvavE0jXDqcMmbE-sZGcsOJLQem8z5bJQzIyhfK9p4RMqzg1lRqUm/exec";
         let session = { usuario: "", nombre: "", bandas: [], misApuestas: [] };
         let currentBet = [];
         let selectedCategory = "";
@@ -99,9 +98,8 @@
         async function login() {
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
-            const b = document.getElementById('btn-login');
             if(!u || !p) return;
-            b.innerText = "VERIFICANDO...";
+            toggleLoader(true);
             try {
                 const r = await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "login", user: u, pass: p }) });
                 const d = await r.json();
@@ -110,8 +108,9 @@
                     localStorage.setItem('podium_v2', JSON.stringify(session));
                     document.getElementById('user-display').innerText = session.nombre;
                     await cargarDatos(); nav('screen-menu');
-                } else { alert("ERROR"); b.innerText = "INGRESAR"; }
-            } catch (e) { alert("ERROR RED"); b.innerText = "INGRESAR"; }
+                } else { alert("ERROR DE ACCESO"); }
+            } catch (e) { alert("ERROR DE RED"); }
+            toggleLoader(false);
         }
 
         async function cargarDatos() {
@@ -134,18 +133,28 @@
                 let html = `<h4 class="font-black text-white uppercase text-xl mb-6 tracking-tighter">${cat}</h4>`;
                 if(apuestaPrevia) {
                     html += `<div class="bg-black/40 p-6 rounded-3xl mb-8 border border-white/5">
-                                <p class="text-[9px] text-slate-500 font-black mb-3 uppercase tracking-widest">TU ELECCIÓN:</p>
                                 <p class="text-xs text-slate-300 font-bold uppercase leading-relaxed">${apuestaPrevia.p1}<br>${apuestaPrevia.p2}<br>${apuestaPrevia.p3}</p>
                              </div>
                              <div class="space-y-4">
                                 <button onclick="abrirCategoria('${cat}')" class="w-full bg-white/5 text-white p-6 rounded-2xl font-black text-xs uppercase border border-white/10">EDITAR PODIUM</button>
                                 <button onclick="verTendencias('${cat}')" class="w-full btn-trends p-6 rounded-2xl font-black text-xs uppercase">VER TENDENCIAS</button>
+                                <button onclick="borrarApuesta('${cat}')" class="btn-eliminar">× ELIMINAR APUESTA</button>
                              </div>`;
                 } else {
                     html += `<button onclick="abrirCategoria('${cat}')" class="w-full bg-white text-slate-950 p-7 rounded-2xl font-black text-xs uppercase">APOSTAR</button>`;
                 }
                 card.innerHTML = html; container.appendChild(card);
             });
+        }
+
+        async function borrarApuesta(cat) {
+            if(!confirm("¿CONFIRMAS ELIMINAR ESTA APUESTA?")) return;
+            toggleLoader(true);
+            try {
+                await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "borrarApuesta", usuario: session.usuario, categoria: cat }) });
+                await cargarDatos();
+            } catch (e) { alert("ERROR AL ELIMINAR"); }
+            toggleLoader(false);
         }
 
         function abrirCategoria(cat) {
@@ -186,7 +195,6 @@
         }
 
         async function enviarApuesta() {
-            if(!confirm("¿CONFIRMAS TU PODIUM?")) return;
             toggleLoader(true);
             try {
                 await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "apostar", usuario: session.usuario, categoria: selectedCategory, p1: currentBet[0], p2: currentBet[1], p3: currentBet[2], monto: 1 }) });
