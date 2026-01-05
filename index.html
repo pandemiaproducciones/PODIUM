@@ -3,66 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PODIUM | Premium</title>
+    <title>PODIUM | Premium Experience</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #0F172A; color: #F8FAFC; overflow-x: hidden; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #05070A; color: #F8FAFC; overflow-x: hidden; }
         .hidden { display: none; }
         
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
         
-        /* Inputs y Botones más grandes para celular */
-        input::placeholder { color: rgba(255,255,255,0.3); }
+        /* BOTONES Y SLOTS ESCALADOS */
         .btn-xl { padding: 24px; border-radius: 24px; font-size: 16px; font-weight: 900; letter-spacing: 1px; }
+        .podium-slot { height: 80px; border-radius: 22px; display: flex; align-items: center; padding: 0 25px; border: 1px solid rgba(255,255,255,0.08); text-transform: uppercase; font-weight: 900; font-size: 14px; margin-bottom: 15px; transition: all 0.3s; }
+        .slot-empty { background: rgba(255, 255, 255, 0.02); color: #475569; border-style: dashed; }
         
-        /* Espacios de Podio mejorados */
-        .podium-slot { height: 80px; border-radius: 22px; display: flex; align-items: center; padding: 0 25px; border: 1px solid rgba(255,255,255,0.1); text-transform: uppercase; font-weight: 900; font-size: 14px; margin-bottom: 12px; }
-        .slot-empty { background: rgba(255, 255, 255, 0.03); color: #64748B; border-style: dashed; }
-        .slot-filled { background: #1E40AF; color: white; border-color: #3B82F6; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4); }
+        /* COLORES DINÁMICOS POR CATEGORÍA */
+        .cat-juvenil { border-top: 6px solid #10B981; } /* Verde */
+        .cat-basica { border-top: 6px solid #F59E0B; }  /* Ámbar */
+        .cat-especial { border-top: 6px solid #3B82F6; } /* Azul */
+        .cat-default { border-top: 6px solid #8B5CF6; }  /* Violeta */
 
-        .band-card { background: rgba(255,255,255,0.05); border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px; }
-        .band-selected { opacity: 0.2; filter: grayscale(1); pointer-events: none; }
+        .band-card { background: rgba(255,255,255,0.03); border-radius: 22px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 12px; }
+        .band-selected { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
     </style>
 </head>
 <body class="antialiased">
 
-    <div id="loader" class="hidden fixed inset-0 bg-slate-900/95 z-50 flex flex-col items-center justify-center text-center p-10">
-        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-        <p class="text-[12px] font-black tracking-[0.3em] text-blue-400 uppercase">SINCRONIZANDO CON EL CEREBRO</p>
+    <div id="loader" class="hidden fixed inset-0 bg-black z-50 flex flex-col items-center justify-center text-center p-10">
+        <div class="w-14 h-14 border-4 border-white/10 border-t-white rounded-full animate-spin mb-6"></div>
+        <p class="text-[11px] font-black tracking-[0.4em] text-white uppercase">SINCRONIZANDO PODIUM</p>
     </div>
 
-    <div id="screen-login" class="flex items-center justify-center min-h-screen p-6">
-        <div class="glass-card p-10 rounded-[45px] w-full max-w-sm text-center">
-            <h1 class="text-5xl font-black mb-2 tracking-tighter">PODIUM</h1>
-            <p class="text-blue-400 text-[10px] mb-14 uppercase tracking-[0.5em] font-bold">PREMIUM EXPERIENCE</p>
-            <div class="space-y-5">
-                <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-6 bg-white/5 border border-white/10 rounded-3xl outline-none text-center font-black text-lg uppercase text-white">
-                <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-6 bg-white/5 border border-white/10 rounded-3xl outline-none text-center text-3xl tracking-[0.5em] font-black text-white">
-                <button id="btn-login" onclick="login()" class="w-full bg-blue-600 text-white btn-xl uppercase shadow-2xl shadow-blue-900/40 mt-6">INGRESAR</button>
+    <div id="screen-login" class="flex items-center justify-center min-h-screen p-8">
+        <div class="glass-card p-12 rounded-[50px] w-full max-w-sm text-center shadow-2xl">
+            <h1 class="text-5xl font-black mb-2 tracking-tighter italic">PODIUM</h1>
+            <p class="text-slate-500 text-[9px] mb-14 uppercase tracking-[0.6em] font-bold">PREMIUM ACCESS</p>
+            <div class="space-y-6">
+                <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-6 bg-white/5 border border-white/10 rounded-3xl outline-none text-center font-black text-lg uppercase text-white focus:border-white/30 transition-all">
+                <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-6 bg-white/5 border border-white/10 rounded-3xl outline-none text-center text-3xl tracking-[0.4em] font-black text-white focus:border-white/30 transition-all">
+                <button id="btn-login" onclick="login()" class="w-full bg-white text-black btn-xl uppercase mt-6 hover:scale-105 transition-transform">INGRESAR</button>
             </div>
         </div>
     </div>
 
     <div id="screen-menu" class="hidden p-8 max-w-md mx-auto flex flex-col min-h-screen">
-        <div class="flex justify-between items-start mb-14 mt-8">
+        <div class="flex justify-between items-start mb-14 mt-10">
             <div>
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-2">BIENVENIDO AL</p>
-                <h2 class="text-4xl font-black text-white uppercase tracking-tighter">PODIUM</h2>
-                <p id="user-display" class="text-blue-400 font-bold text-sm uppercase mt-2">---</p>
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-2">PLATAFORMA</p>
+                <h2 class="text-4xl font-black text-white uppercase tracking-tighter italic">PODIUM</h2>
+                <p id="user-display" class="text-slate-400 font-bold text-xs uppercase mt-3 bg-white/5 px-3 py-1 rounded-lg inline-block">---</p>
             </div>
-            <button onclick="logout()" class="text-[10px] font-black uppercase text-red-400 border border-red-900/30 px-5 py-3 rounded-2xl bg-red-950/20">SALIR</button>
+            <button onclick="logout()" class="text-[10px] font-black uppercase text-red-500 bg-red-500/10 px-5 py-3 rounded-2xl border border-red-500/20">SALIR</button>
         </div>
-        <p class="font-black text-slate-500 text-[11px] uppercase mb-8 tracking-[0.2em]">CATEGORÍAS ACTIVAS</p>
-        <div id="categories-container" class="space-y-8"></div>
+        <p class="font-black text-slate-500 text-[11px] uppercase mb-10 tracking-[0.3em] text-center">CATEGORÍAS DEL CONCURSO</p>
+        <div id="categories-container" class="space-y-10"></div>
     </div>
 
-    <div id="screen-bet" class="hidden p-8 max-w-md mx-auto flex flex-col min-h-screen pb-40">
-        <button onclick="nav('screen-menu')" class="text-xs font-black text-slate-500 uppercase mb-10 tracking-widest flex items-center">
-            <span class="text-2xl mr-3">←</span> VOLVER
+    <div id="screen-bet" class="hidden p-8 max-w-md mx-auto flex flex-col min-h-screen pb-44">
+        <button onclick="nav('screen-menu')" class="text-[11px] font-black text-slate-500 uppercase mb-10 tracking-widest flex items-center">
+            <span class="text-2xl mr-3">←</span> VOLVER AL MENÚ
         </button>
-        <h2 id="active-category" class="text-4xl font-black text-white uppercase mb-2">---</h2>
-        <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mb-12">ARMA TU TRIPLETA GANADORA</p>
+        <h2 id="active-category" class="text-4xl font-black text-white uppercase mb-3 leading-tight">---</h2>
+        <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-12">DEFINE TU TRIPLETA GANADORA</p>
 
         <div class="mb-14">
             <div id="slot-1" class="podium-slot slot-empty">1° LUGAR</div>
@@ -70,18 +72,18 @@
             <div id="slot-3" class="podium-slot slot-empty">3° LUGAR</div>
         </div>
 
-        <div id="bands-container" class="space-y-3"></div>
+        <div id="bands-container" class="space-y-4"></div>
 
-        <div class="fixed bottom-0 left-0 w-full p-8 bg-slate-950/95 backdrop-blur-2xl border-t border-white/10 z-50">
-            <button id="btn-confirm" onclick="enviarApuesta()" disabled class="w-full bg-blue-600 text-white p-7 rounded-[30px] font-black uppercase tracking-widest text-sm opacity-50 transition-all">CONFIRMAR MI PODIUM</button>
+        <div class="fixed bottom-0 left-0 w-full p-8 bg-black border-t border-white/10 z-50">
+            <button id="btn-confirm" onclick="enviarApuesta()" disabled class="w-full bg-white text-black p-7 rounded-[30px] font-black uppercase tracking-widest text-sm opacity-50 shadow-2xl">CONFIRMAR MI PODIUM</button>
         </div>
     </div>
 
-    <div id="modal-trends" class="hidden fixed inset-0 bg-slate-950/98 z-[60] p-10 flex flex-col items-center justify-center">
-        <h3 class="text-3xl font-black text-white uppercase mb-3">TENDENCIAS</h3>
-        <p id="trends-cat-name" class="text-blue-400 text-[10px] font-black uppercase tracking-[0.4em] mb-14 text-center">---</p>
-        <div id="trends-list" class="w-full max-w-sm space-y-8 overflow-y-auto max-h-[55vh] pr-2"></div>
-        <button onclick="closeTrends()" class="mt-16 text-xs font-black text-slate-400 uppercase tracking-widest border border-white/20 px-12 py-6 rounded-3xl active:bg-white/5">CERRAR VENTANA</button>
+    <div id="modal-trends" class="hidden fixed inset-0 bg-black z-[60] p-10 flex flex-col items-center justify-center">
+        <h3 class="text-3xl font-black text-white uppercase mb-4 tracking-tighter italic">TENDENCIAS</h3>
+        <p id="trends-cat-name" class="text-slate-500 text-[10px] font-black uppercase tracking-[0.4em] mb-16 text-center">ANÁLISIS DE LA COMUNIDAD</p>
+        <div id="trends-list" class="w-full max-w-sm space-y-10 overflow-y-auto max-h-[50vh] pr-4"></div>
+        <button onclick="closeTrends()" class="mt-16 text-xs font-black text-slate-500 uppercase tracking-widest border border-white/10 px-12 py-6 rounded-3xl active:bg-white/5">CERRAR ANÁLISIS</button>
     </div>
 
     <script>
@@ -95,12 +97,21 @@
             if (saved) { session = JSON.parse(saved); document.getElementById('user-display').innerText = session.nombre; cargarDatos(); nav('screen-menu'); }
         };
 
+        // ASIGNACIÓN DE COLORES POR NOMBRE DE CATEGORÍA
+        function getCatClass(cat) {
+            const c = cat.toLowerCase();
+            if (c.includes('juvenil')) return 'cat-juvenil';
+            if (c.includes('basica') || c.includes('básica')) return 'cat-basica';
+            if (c.includes('especial')) return 'cat-especial';
+            return 'cat-default';
+        }
+
         async function login() {
             const u = document.getElementById('user-input').value.trim();
             const p = document.getElementById('pass-input').value.trim();
             const b = document.getElementById('btn-login');
             if(!u || !p) return;
-            b.classList.add('btn-loading'); b.innerText = "VERIFICANDO...";
+            b.innerText = "ACCEDIENDO...";
             try {
                 const r = await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "login", user: u, pass: p }) });
                 const d = await r.json();
@@ -109,11 +120,9 @@
                     localStorage.setItem('podium_v2', JSON.stringify(session));
                     document.getElementById('user-display').innerText = session.nombre;
                     await cargarDatos(); nav('screen-menu');
-                } else { alert("ERROR DE ACCESO"); resetLoginBtn(); }
-            } catch (e) { alert("ERROR DE RED"); resetLoginBtn(); }
+                } else { alert("ACCESO DENEGADO"); b.innerText = "INGRESAR"; }
+            } catch (e) { alert("ERROR DE CONEXIÓN"); b.innerText = "INGRESAR"; }
         }
-
-        function resetLoginBtn() { const b = document.getElementById('btn-login'); b.classList.remove('btn-loading'); b.innerText = "INGRESAR"; }
 
         async function cargarDatos() {
             try {
@@ -132,21 +141,21 @@
             cats.forEach(cat => {
                 const apuestaPrevia = session.misApuestas.find(a => a.categoria === cat);
                 const card = document.createElement('div');
-                card.className = "glass-card p-10 rounded-[45px] text-center shadow-xl border-white/5";
+                card.className = `glass-card p-10 rounded-[45px] text-center shadow-2xl ${getCatClass(cat)}`;
                 
-                let html = `<h4 class="font-black text-white uppercase text-xl mb-6 tracking-tighter">${cat}</h4>`;
+                let html = `<h4 class="font-black text-white uppercase text-2xl mb-6 tracking-tighter italic">${cat}</h4>`;
                 
                 if(apuestaPrevia) {
-                    html += `<div class="bg-blue-900/20 p-5 rounded-3xl mb-8">
-                                <p class="text-[9px] text-blue-400 font-black mb-3 uppercase tracking-widest text-center">TU PODIO ACTUAL:</p>
-                                <p class="text-xs text-white font-bold uppercase leading-relaxed text-center">${apuestaPrevia.p1}<br>${apuestaPrevia.p2}<br>${apuestaPrevia.p3}</p>
+                    html += `<div class="bg-white/5 p-6 rounded-3xl mb-10">
+                                <p class="text-[9px] text-slate-500 font-black mb-4 uppercase tracking-widest">TU PODIUM ACTUAL</p>
+                                <p class="text-xs text-white font-bold uppercase leading-loose text-center">${apuestaPrevia.p1}<br>${apuestaPrevia.p2}<br>${apuestaPrevia.p3}</p>
                              </div>
                              <div class="space-y-4">
-                                <button onclick="abrirCategoria('${cat}')" class="w-full bg-white/5 text-white p-6 rounded-2xl font-black text-xs uppercase border border-white/10 active:bg-white/10">EDITAR PODIUM</button>
-                                <button onclick="verTendencias('${cat}')" class="w-full bg-blue-600/20 text-blue-400 p-6 rounded-2xl font-black text-xs uppercase border border-blue-500/30 active:bg-blue-600/30">VER TENDENCIAS</button>
+                                <button onclick="abrirCategoria('${cat}')" class="w-full bg-white/5 text-white p-6 rounded-2xl font-black text-[10px] uppercase border border-white/10">EDITAR PODIUM</button>
+                                <button onclick="verTendencias('${cat}')" class="w-full bg-white text-black p-6 rounded-2xl font-black text-[10px] uppercase shadow-xl">VER TENDENCIAS</button>
                              </div>`;
                 } else {
-                    html += `<button onclick="abrirCategoria('${cat}')" class="w-full bg-blue-600 text-white p-7 rounded-2xl font-black text-xs uppercase shadow-2xl shadow-blue-600/40">EMPEZAR APUESTA</button>`;
+                    html += `<button onclick="abrirCategoria('${cat}')" class="w-full bg-white text-black p-7 rounded-2xl font-black text-[11px] uppercase shadow-2xl">EMPEZAR APUESTA</button>`;
                 }
                 card.innerHTML = html; container.appendChild(card);
             });
@@ -166,8 +175,8 @@
                 const div = document.createElement('div');
                 div.id = `band-${b.banda}`;
                 div.className = "band-card p-6 flex items-center justify-between";
-                div.innerHTML = `<span class="font-black text-sm uppercase pr-4">${b.banda}</span>
-                                 <button onclick="seleccionarBanda('${b.banda}')" class="text-blue-400 font-black text-xs bg-blue-500/10 px-6 py-4 rounded-2xl border border-blue-500/20 active:bg-blue-500/30">ELEGIR</button>`;
+                div.innerHTML = `<span class="font-black text-sm uppercase pr-6 leading-tight">${b.banda}</span>
+                                 <button onclick="seleccionarBanda('${b.banda}')" class="text-white font-black text-[10px] bg-white/10 px-6 py-4 rounded-2xl border border-white/20 active:scale-90 transition-transform">ELEGIR</button>`;
                 container.appendChild(div);
             });
         }
@@ -182,7 +191,7 @@
         function actualizarPodio() {
             for(let i = 1; i <= 3; i++) {
                 const s = document.getElementById(`slot-${i}`);
-                if(currentBet[i-1]) { s.innerText = `${i}° ${currentBet[i-1]}`; s.className = "podium-slot slot-filled"; }
+                if(currentBet[i-1]) { s.innerText = `${i}° ${currentBet[i-1]}`; s.className = "podium-slot bg-white text-black border-white font-black"; }
                 else { s.innerText = `${i}° LUGAR`; s.className = "podium-slot slot-empty"; }
             }
             const b = document.getElementById('btn-confirm');
@@ -194,8 +203,8 @@
             toggleLoader(true);
             try {
                 await fetch(MOTOR_URL, { method: 'POST', body: JSON.stringify({ action: "apostar", usuario: session.usuario, categoria: selectedCategory, p1: currentBet[0], p2: currentBet[1], p3: currentBet[2], monto: 1 }) });
-                await cargarDatos(); alert("🎯 REGISTRADO"); nav('screen-menu');
-            } catch (e) { alert("ERROR"); }
+                await cargarDatos(); alert("🎯 PODIUM REGISTRADO"); nav('screen-menu');
+            } catch (e) { alert("ERROR AL GUARDAR"); }
             toggleLoader(false);
         }
 
@@ -209,13 +218,13 @@
                 list.innerHTML = d.tendencias.map(t => {
                     const pct = ((t.votos / total) * 100).toFixed(0);
                     return `<div>
-                                <div class="flex justify-between mb-3"><span class="text-xs font-black uppercase text-white">${t.nombre}</span><span class="text-blue-400 font-black text-xs">${pct}%</span></div>
-                                <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden"><div class="bg-blue-600 h-full rounded-full" style="width: ${pct}%"></div></div>
+                                <div class="flex justify-between mb-4"><span class="text-xs font-black uppercase text-white">${t.nombre}</span><span class="text-slate-400 font-black text-xs">${pct}%</span></div>
+                                <div class="w-full bg-white/5 h-3 rounded-full overflow-hidden"><div class="bg-white h-full rounded-full" style="width: ${pct}%"></div></div>
                             </div>`;
                 }).join('');
                 document.getElementById('trends-cat-name').innerText = cat;
                 document.getElementById('modal-trends').classList.remove('hidden');
-            } catch (e) { alert("ERROR"); }
+            } catch (e) { alert("ERROR AL CARGAR"); }
             toggleLoader(false);
         }
 
