@@ -27,7 +27,10 @@
         .btn-salir { background: #7F1D1D; color: #FEE2E2; border: 1px solid #B91C1C; padding: 12px 24px; border-radius: 18px; font-weight: 900; font-size: 13px; }
         .btn-delete { color: #F87171; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; display: inline-block; opacity: 0.8; }
         
-        .stats-panel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 35px; padding: 25px; display: flex; align-items: center; margin-bottom: 30px; }
+        /* Panel Consolidado Dinámico */
+        .stats-panel-consolidado { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 35px; padding: 20px; margin-bottom: 30px; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .stat-row:last-child { border-bottom: none; }
     </style>
 </head>
 <body class="antialiased">
@@ -59,16 +62,8 @@
             <button onclick="logout()" class="btn-salir uppercase">SALIR</button>
         </div>
 
-        <div class="stats-panel">
-            <div class="text-center border-r border-white/10 pr-4 w-[35%]">
-                <p id="count-users" class="text-2xl font-black text-white">0</p>
-                <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-tight">PARTICIPANTES</p>
+        <div id="consolidado-container" class="stats-panel-consolidado">
             </div>
-            <div class="text-center pl-6 w-[65%]">
-                <p id="count-pozo" class="text-3xl font-black text-white">$0</p>
-                <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">POZO GLOBAL</p>
-            </div>
-        </div>
 
         <p class="font-black text-slate-700 text-[12px] uppercase mb-8 tracking-[0.3em] text-center">CATEGORÍAS ACTIVAS</p>
         <div id="categories-container" class="space-y-6"></div>
@@ -132,13 +127,33 @@
                 const d = await r.json();
                 session.bandas = d.bandas; 
                 session.misApuestas = d.misApuestas;
-                session.rawApuestas = d.rawApuestas || []; // Todas para calcular pozos locales
+                session.rawApuestas = d.rawApuestas || [];
 
-                document.getElementById('count-users').innerText = d.totalParticipantes || 0;
-                document.getElementById('count-pozo').innerText = "$" + (d.totalPozo || 0).toLocaleString();
-                
+                renderConsolidado();
                 renderCategorias();
             } catch (e) { console.error(e); }
+        }
+
+        function renderConsolidado() {
+            const container = document.getElementById('consolidado-container');
+            container.innerHTML = `<p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4 text-center">CONSOLIDADO POR NIVELES</p>`;
+            
+            const cats = [...new Set(session.bandas.map(b => b.nivel))];
+            
+            cats.forEach(cat => {
+                const localBets = session.rawApuestas ? session.rawApuestas.filter(a => a[2] === cat) : [];
+                const localPozo = localBets.reduce((acc, a) => acc + (parseFloat(a[6]) || 0), 0);
+                const localUsers = localBets.length;
+
+                const row = document.createElement('div');
+                row.className = "stat-row";
+                row.innerHTML = `
+                    <div class="w-1/3"><p class="text-[11px] font-black text-white uppercase truncate">${cat}</p></div>
+                    <div class="w-1/3 text-center"><p class="text-[11px] font-black text-slate-400 uppercase">${localUsers} PERS.</p></div>
+                    <div class="w-1/3 text-right"><p class="text-[12px] font-black text-white">$${localPozo.toLocaleString()}</p></div>
+                `;
+                container.appendChild(row);
+            });
         }
 
         function renderCategorias() {
@@ -148,19 +163,10 @@
             
             cats.forEach((cat, index) => {
                 const miApuesta = session.misApuestas.find(a => a.categoria === cat);
-                
-                // Cálculo de pozo local
-                const localBets = session.rawApuestas ? session.rawApuestas.filter(a => a[2] === cat) : [];
-                const localPozo = localBets.reduce((acc, a) => acc + (parseFloat(a[6]) || 0), 0);
-                const localUsers = localBets.length;
-
                 const card = document.createElement('div');
                 card.className = `${index % 2 === 0 ? 'card-gray-1' : 'card-gray-2'} rounded-[40px] text-center`;
                 
-                let html = `
-                    <h4 class="font-black text-white uppercase text-2xl mb-1 tracking-tighter">${cat}</h4>
-                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">${localUsers} PARTICIPANTES | POZO: $${localPozo.toLocaleString()}</p>
-                `;
+                let html = `<h4 class="font-black text-white uppercase text-2xl mb-6 tracking-tighter">${cat}</h4>`;
                 
                 if(miApuesta) {
                     const edits = parseInt(miApuesta.ediciones || 0);
@@ -174,7 +180,7 @@
                         <div class="space-y-4">
                     `;
                     if(edits < 3) {
-                        html += `<button onclick="confirmarEdicion('${cat}', ${edits})" class="w-full bg-white/5 text-white p-5 rounded-2xl font-black text-sm uppercase border border-white/10">EDITAR ESTRATEGIA</button>`;
+                        html += `<button onclick="confirmarEdicion('${cat}', ${edits})" class="w-full bg-white/5 text-white p-5 rounded-2xl font-black text-sm uppercase border border-white/10">EDITAR APUESTA</button>`;
                     } else {
                         html += `<p class="text-[9px] font-black text-red-500 uppercase">PODIUM BLINDADO</p>`;
                     }
