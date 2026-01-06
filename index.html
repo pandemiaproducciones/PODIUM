@@ -16,6 +16,7 @@
         .btn-xl { padding: 24px; border-radius: 24px; font-size: 18px; font-weight: 900; letter-spacing: 1px; }
         .modal-blur { background: rgba(10, 15, 26, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); }
         .btn-trends { background: rgba(255, 255, 255, 0.05); color: #94A3B8; border: 1px solid rgba(255, 255, 255, 0.1); font-size: 14px !important; }
+        .btn-salir { background: #7F1D1D; color: #FEE2E2; border: 1px solid #B91C1C; padding: 12px 24px; border-radius: 18px; font-weight: 900; font-size: 13px; }
         
         .podium-slot { height: 75px; border-radius: 20px; display: flex; align-items: center; padding: 0 25px; border: 1px solid rgba(255,255,255,0.08); text-transform: uppercase; font-weight: 900; font-size: 17px; margin-bottom: 10px; }
         .slot-empty { background: rgba(255, 255, 255, 0.02); color: #475569; border-style: dashed; }
@@ -23,8 +24,6 @@
 
         .band-card { background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; padding: 18px !important; }
         .band-selected { opacity: 0.1; filter: grayscale(1); pointer-events: none; }
-        
-        .btn-salir { background: #7F1D1D; color: #FEE2E2; border: 1px solid #B91C1C; padding: 12px 24px; border-radius: 18px; font-weight: 900; font-size: 13px; }
         
         .stats-panel-consolidado { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 35px; padding: 25px; margin-bottom: 30px; }
         .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -38,6 +37,7 @@
         <p class="text-[11px] font-black tracking-[0.4em] text-slate-500 uppercase">SINCRONIZANDO...</p>
     </div>
 
+    <!-- PANTALLA: LOGIN -->
     <div id="screen-login" class="flex items-center justify-center min-h-screen p-6">
         <div class="bg-slate-900/50 p-10 rounded-[45px] w-full max-w-sm text-center border border-white/5 shadow-2xl">
             <h1 class="text-6xl font-black mb-2 tracking-tighter uppercase">PODIUM</h1>
@@ -45,11 +45,12 @@
             <div class="space-y-5">
                 <input type="text" id="user-input" placeholder="USUARIO" class="w-full p-6 bg-white/5 border border-white/10 rounded-3xl outline-none text-center font-black uppercase text-white" style="font-size: 20px;">
                 <input type="password" id="pass-input" placeholder="CONTRASEÑA" class="w-full p-6 bg-white/5 border border-white/10 rounded-3xl outline-none text-center tracking-widest font-black text-white" style="font-size: 20px;">
-                <button id="btn-login" onclick="login()" class="w-full bg-white text-slate-950 btn-xl uppercase mt-6">INGRESAR</button>
+                <button onclick="login()" class="w-full bg-white text-slate-950 btn-xl uppercase mt-6">INGRESAR</button>
             </div>
         </div>
     </div>
 
+    <!-- PANTALLA: MENÚ PRINCIPAL -->
     <div id="screen-menu" class="hidden p-8 max-w-md mx-auto flex flex-col min-h-screen">
         <div class="flex justify-between items-center mb-10 mt-8">
             <div>
@@ -60,29 +61,36 @@
             <button onclick="logout()" class="btn-salir uppercase">SALIR</button>
         </div>
 
-        <div id="consolidado-container" class="stats-panel-consolidado">
-            </div>
+        <div id="consolidado-container" class="stats-panel-consolidado"></div>
 
         <p class="font-black text-slate-700 text-[12px] uppercase mb-8 tracking-[0.3em] text-center">NIVELES ACTIVOS</p>
         <div id="categories-container" class="space-y-6"></div>
     </div>
 
+    <!-- PANTALLA: APUESTA -->
     <div id="screen-bet" class="hidden p-8 max-w-md mx-auto flex flex-col min-h-screen pb-44">
-        <button onclick="nav('screen-menu')" class="text-sm font-black text-slate-600 uppercase mb-10 tracking-widest flex items-center">
+        <button onclick="intentarCancelar()" class="text-sm font-black text-slate-600 uppercase mb-10 tracking-widest flex items-center">
             <span class="text-2xl mr-3">←</span> VOLVER
         </button>
         <h2 id="active-category" class="text-4xl font-black text-white uppercase mb-1">---</h2>
+        
         <div class="mb-10 mt-10">
             <div id="slot-1" class="podium-slot slot-empty">1° LUGAR</div>
             <div id="slot-2" class="podium-slot slot-empty">2° LUGAR</div>
             <div id="slot-3" class="podium-slot slot-empty">3° LUGAR</div>
         </div>
+
         <div id="bands-container" class="space-y-3"></div>
+
         <div class="fixed bottom-0 left-0 w-full p-8 bg-slate-950/90 backdrop-blur-2xl border-t border-white/5 z-50">
-            <button id="btn-confirm" onclick="enviarApuesta()" disabled class="w-full bg-white text-slate-950 p-7 rounded-[30px] font-black uppercase tracking-widest text-base opacity-50">CONFIRMAR PODIUM</button>
+            <div class="flex gap-4">
+                <button onclick="intentarCancelar()" class="w-1/3 bg-slate-800 text-slate-400 p-5 rounded-[25px] font-black uppercase tracking-widest text-xs border border-white/5">CANCELAR</button>
+                <button id="btn-confirm" onclick="enviarApuesta()" disabled class="w-2/3 bg-white text-slate-950 p-5 rounded-[25px] font-black uppercase tracking-widest text-xs opacity-50">CONFIRMAR PODIUM</button>
+            </div>
         </div>
     </div>
 
+    <!-- MODAL: TENDENCIAS -->
     <div id="modal-trends" class="hidden fixed inset-0 modal-blur z-[60] p-10 flex flex-col items-center justify-center">
         <h3 class="text-4xl font-black text-white uppercase mb-2 tracking-tighter">TENDENCIAS</h3>
         <p id="trends-cat-name" class="text-slate-500 text-[11px] font-black uppercase tracking-[0.4em] mb-14 text-center">TOP 2 SELECCIONADOS</p>
@@ -98,7 +106,12 @@
 
         window.onload = () => {
             const saved = localStorage.getItem('podium_v2');
-            if (saved) { session = JSON.parse(saved); document.getElementById('user-display').innerText = session.nombre; cargarDatos(); nav('screen-menu'); }
+            if (saved) { 
+                session = JSON.parse(saved); 
+                document.getElementById('user-display').innerText = session.nombre; 
+                cargarDatos(); 
+                nav('screen-menu'); 
+            }
         };
 
         async function login() {
@@ -163,7 +176,7 @@
                     html += `
                         <div class="bg-black/40 p-6 rounded-3xl mb-6 border border-white/5">
                             <p class="text-[10px] font-black uppercase tracking-[0.3em] mb-3 ${statusColor}">ESTADO: ${miApuesta.estatus}</p>
-                            <p class="text-[13px] text-white font-black mb-4 uppercase tracking-widest text-center">TU PODIUM: $${miApuesta.monto.toLocaleString()}</p>
+                            <p class="text-[13px] text-white font-black mb-4 uppercase tracking-widest text-center">TU PODIUM (FONDO: $${miApuesta.monto.toLocaleString()}):</p>
                             <p class="text-[15px] text-slate-300 font-bold uppercase leading-relaxed text-center">${miApuesta.p1}<br>${miApuesta.p2}<br>${miApuesta.p3}</p>
                         </div>
                         <div class="space-y-4">
@@ -183,10 +196,16 @@
 
         function confirmarEdicion(cat, edits) {
             let msg = "";
-            if(edits == 0) msg = "¿Confirmar actualización de estrategia?\nEsta gestión tiene un costo operativo de $1.000. Tu fondo disponible para el premio final se ajustará a $18.000. Te quedarán 2 cambios disponibles.";
-            if(edits == 1) msg = "¿Confirmar nueva gestión de datos?\nPara procesar este segundo cambio, se aplicará un costo de mantenimiento de $1.000. Tu fondo en juego será de $17.000. Te quedará 1 último cambio disponible.";
-            if(edits == 2) msg = "¿Confirmar última actualización disponible?\nEste ajuste final de datos tiene un costo operativo de $1.000. Tu fondo definitivo para el pozo será de $16.000. Tras esta acción, tu Podium quedará blindado.";
+            if(edits == 0) msg = "¿Confirmar actualización de estrategia?\nEsta gestión tiene un costo operativo de $1.000. Tu fondo disponible para el premio final se ajustará a $19.000. Te quedarán 2 cambios disponibles.";
+            if(edits == 1) msg = "¿Confirmar nueva gestión de datos?\nPara procesar este segundo cambio, se aplicará un costo de mantenimiento de $1.000. Tu fondo en juego será de $18.000. Te quedará 1 último cambio disponible.";
+            if(edits == 2) msg = "¿Confirmar última actualización disponible?\nEste ajuste final de datos tiene un costo operativo de $1.000. Tu fondo definitivo para el pozo será de $17.000. Tras esta acción, tu Podium quedará blindado.";
             if(confirm(msg)) abrirCategoria(cat);
+        }
+
+        function intentarCancelar() {
+            if(confirm("¿DESEAS CANCELAR LA OPERACIÓN?\nNo se guardará ninguna selección.")) {
+                nav('screen-menu');
+            }
         }
 
         function abrirCategoria(cat) {
@@ -204,7 +223,7 @@
                 div.id = `band-${b.banda}`;
                 div.className = "band-card flex items-center justify-between";
                 div.innerHTML = `<span class="font-black text-base uppercase text-slate-200">${b.banda}</span>
-                                 <button onclick="seleccionarBanda('${b.banda}')" class="text-white font-black text-sm bg-white/5 px-6 py-4 rounded-xl border border-white/10">ELEGIR</button>`;
+                                 <button onclick="seleccionarBanda('${b.banda}')" class="text-white font-black text-sm bg-white/5 px-6 py-4 rounded-xl border border-white/10 uppercase">ELEGIR</button>`;
                 container.appendChild(div);
             });
         }
@@ -262,3 +281,4 @@
     </script>
 </body>
 </html>
+
