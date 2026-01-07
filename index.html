@@ -41,7 +41,7 @@
         <div class="premium-card p-10 shadow-2xl">
             <input id="login-user" type="text" placeholder="USUARIO" class="w-full p-5 mb-5 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold uppercase outline-none focus:border-amber-500">
             <input id="login-pass" type="password" placeholder="CONTRASEÑA" class="w-full p-5 mb-8 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold outline-none focus:border-amber-500">
-            <button onclick="handleLogin()" class="w-full btn-gold py-5 rounded-2xl text-lg font-black uppercase shadow-lg">ENTRAR</button>
+            <button onclick="handleLogin()" class="w-full btn-gold py-5 rounded-2xl text-lg font-black uppercase shadow-lg active:scale-95 transition-transform">ENTRAR</button>
         </div>
     </div>
 
@@ -94,7 +94,7 @@
         </div>
         <div id="band-container" class="grid grid-cols-2 gap-3 max-h-[40vh] overflow-y-auto pb-24"></div>
         <div class="fixed bottom-0 left-0 w-full p-5 bg-slate-900/95 flex gap-4 backdrop-blur-md">
-            <button onclick="volverDashboard()" class="flex-1 border border-slate-700 py-5 rounded-2xl text-[12px] font-black uppercase">CANCELAR</button>
+            <button onclick="cancelarPodium()" class="flex-1 border border-slate-700 py-5 rounded-2xl text-[12px] font-black uppercase">CANCELAR</button>
             <button onclick="prepararConfirmacion()" class="flex-[2] btn-gold py-5 rounded-2xl text-[12px] font-black uppercase shadow-lg">CONFIRMAR</button>
         </div>
     </div>
@@ -116,32 +116,27 @@
         let app = { region: '', nivel: '', p1: '', p2: '', p3: '', ediciones: 0, existe: false };
         let cacheData = {};
 
-        // INICIO: Recuperar estado al refrescar
-        window.onload = () => {
-            if (user) {
-                const savedRegion = localStorage.getItem('podium_region');
-                const savedNivel = localStorage.getItem('podium_nivel');
-                
-                initApp();
-                
-                if (savedRegion) {
-                    cargarDatosRegion(savedRegion).then(() => {
-                        if (savedNivel) abrirNivel(savedNivel);
-                    });
-                }
-            }
-        };
+        if (user) initApp();
 
         function toggleLoader(s, text = "PROCESANDO...") { 
             document.getElementById('loader-text').innerText = text;
             document.getElementById('loading-overlay').classList.toggle('hidden', !s); 
         }
 
-        function initApp() {
+        async function initApp() {
             document.getElementById('header-username').innerText = user;
             document.getElementById('global-header').classList.remove('hidden');
-            showView('view-region');
-            renderRegiones();
+            const savedRegion = localStorage.getItem('podium_region');
+            const savedNivel = localStorage.getItem('podium_nivel');
+            if (savedRegion) {
+                app.region = savedRegion;
+                await cargarDatosRegion(savedRegion, false);
+                if (savedNivel) abrirNivel(savedNivel);
+                else showView('view-dashboard');
+            } else {
+                showView('view-region');
+                renderRegiones();
+            }
         }
 
         function showView(id) {
@@ -152,8 +147,12 @@
             else {
                 cont.classList.remove('invisible');
                 document.getElementById('btn-atras').onclick = () => {
-                    if (id === 'view-podium') volverDashboard();
-                    else volverRegiones();
+                    if(id === 'view-dashboard') {
+                        localStorage.removeItem('podium_region');
+                        showView('view-region');
+                    } else if(id === 'view-podium') {
+                        cancelarPodium();
+                    }
                 };
             }
         }
@@ -164,16 +163,18 @@
             rs.forEach(r => {
                 const b = document.createElement('button');
                 b.className = 'premium-card p-6 font-black uppercase text-lg text-center';
-                b.innerText = r; b.onclick = () => cargarDatosRegion(r);
+                b.innerText = r; b.onclick = () => {
+                    localStorage.setItem('podium_region', r);
+                    cargarDatosRegion(r);
+                };
                 c.appendChild(b);
             });
         }
 
-        async function cargarDatosRegion(region) {
+        async function cargarDatosRegion(region, changeView = true) {
             app.region = region;
-            localStorage.setItem('podium_region', region); // Guardar persistencia
             document.getElementById('dash-region-tag').innerText = region;
-            showView('view-dashboard');
+            if(changeView) showView('view-dashboard');
             toggleLoader(true, "CARGANDO DATOS...");
             const niveles = ['basico', 'medio', 'alto'];
             try {
@@ -185,21 +186,36 @@
                     const btnBox = document.getElementById(`btns-${n}`);
                     if(d.miApuesta) btnBox.classList.remove('hidden'); else btnBox.classList.add('hidden');
                 });
-            } catch(e) { alert('ERROR DE CONEXIÓN'); }
+            } catch(e) { console.error(e); }
             toggleLoader(false);
         }
 
         function confirmarModificar(nivelLabel) {
+            const nNorm = nivelLabel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const d = cacheData[nNorm];
+            const edicionesActuales = d.miApuesta ? d.miApuesta.ediciones : 0;
+
+            if (edicionesActuales >= 3) {
+                document.getElementById('modal-title').innerText = "SIN INTENTOS";
+                document.getElementById('modal-text').innerText = "Ya has utilizado tus tres oportunidades de modificación.\n\nNo se permiten más cambios a esta apuesta.";
+                document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
+                document.getElementById('btn-modal-ok').onclick = closeModal;
+                document.getElementById('btn-modal-cancel').classList.add('hidden');
+                document.getElementById('modal-confirm').classList.remove('hidden');
+                return;
+            }
+
             document.getElementById('modal-title').innerText = "ATENCIÓN";
-            document.getElementById('modal-text').innerText = "VAS A EDITAR TU APUESTA.\n\nESTE PROCESO TIENE UN COSTO DE $1.000 QUE SE DESCONTARÁ DEL POZO.";
+            document.getElementById('modal-text').innerText = `Vas a editar tu apuesta.\n\nEsta es la modificación #${edicionesActuales + 1}.\nCosto: $1.000 que se descontará del pozo.`;
             document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
             document.getElementById('btn-modal-ok').onclick = () => { closeModal(); abrirNivel(nivelLabel); };
+            document.getElementById('btn-modal-cancel').classList.remove('hidden');
             document.getElementById('modal-confirm').classList.remove('hidden');
         }
 
         function abrirNivel(nivelLabel) {
             app.nivel = nivelLabel;
-            localStorage.setItem('podium_nivel', nivelLabel); // Guardar persistencia
+            localStorage.setItem('podium_nivel', nivelLabel);
             const nNorm = nivelLabel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             const d = cacheData[nNorm];
             app.p1 = app.p2 = app.p3 = '';
@@ -207,7 +223,7 @@
             if(d.miApuesta) {
                 app.p1 = d.miApuesta.p1; app.p2 = d.miApuesta.p2; app.p3 = d.miApuesta.p3;
                 app.ediciones = d.miApuesta.ediciones; app.existe = true;
-            } else { app.existe = false; }
+            } else { app.existe = false; app.ediciones = 0; }
             renderBandas(d.bandas, nNorm);
             syncUI();
             showView('view-podium');
@@ -245,23 +261,20 @@
         }
 
         function removeBand(s) { app['p'+s] = ''; syncUI(); }
+        function cancelarPodium() { localStorage.removeItem('podium_nivel'); showView('view-dashboard'); }
 
         function prepararConfirmacion() {
             const picks = [app.p1, app.p2, app.p3].filter(p => p !== '');
             if(picks.length < 3) return alert('COMPLETA EL PÓDIUM');
-            
             const uniquePicks = new Set(picks);
-            if(uniquePicks.size !== 3) return alert('ERROR: UNA BANDA NO PUEDE ESTAR EN DOS POSICIONES');
+            if(uniquePicks.size !== 3) return alert('UNA BANDA NO PUEDE ESTAR EN DOS POSICIONES');
 
-            if(app.existe) {
-                execSave();
-            } else {
-                document.getElementById('modal-title').innerText = "¿CONFIRMAR?";
-                document.getElementById('modal-text').innerText = `ESTA APUESTA TIENE UN VALOR DE $20.000.`;
-                document.getElementById('btn-modal-ok').innerText = "SÍ, ENVIAR";
-                document.getElementById('btn-modal-ok').onclick = execSave;
-                document.getElementById('modal-confirm').classList.remove('hidden');
-            }
+            document.getElementById('modal-title').innerText = "¿CONFIRMAR?";
+            document.getElementById('modal-text').innerText = app.existe ? `MODIFICAR COSTARÁ $1.000.\nINTENTO: ${app.ediciones + 1} DE 3.` : `ESTA APUESTA TIENE UN VALOR DE $20.000.`;
+            document.getElementById('btn-modal-ok').innerText = "SÍ, ENVIAR";
+            document.getElementById('btn-modal-ok').onclick = execSave;
+            document.getElementById('btn-modal-cancel').classList.remove('hidden');
+            document.getElementById('modal-confirm').classList.remove('hidden');
         }
 
         async function execSave() {
@@ -269,8 +282,9 @@
             try {
                 const nNorm = app.nivel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'saveApuesta', user, region: app.region, categoria: nNorm, p1: app.p1, p2: app.p2, p3: app.p3 }) });
-                alert('¡ÉXITO!'); await cargarDatosRegion(app.region); 
-                volverDashboard();
+                alert('¡ÉXITO!');
+                localStorage.removeItem('podium_nivel');
+                await cargarDatosRegion(app.region); 
             } catch(e) { alert('ERROR'); }
             toggleLoader(false);
         }
@@ -302,7 +316,7 @@
                 if(d.success) {
                     if(d.status === 'INACTIVO') {
                         document.getElementById('modal-title').innerText = "CUENTA INACTIVA";
-                        document.getElementById('modal-text').innerText = "TU USUARIO NO SE ENCUENTRA ACTIVO.\n\nPOR FAVOR, COMUNÍCATE CON EL ADMINISTRADOR PARA HABILITAR TU CUENTA.";
+                        document.getElementById('modal-text').innerText = "Tu usuario no se encuentra activo.\n\nComunícate con el administrador.";
                         document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
                         document.getElementById('btn-modal-ok').onclick = closeModal;
                         document.getElementById('btn-modal-cancel').classList.add('hidden');
@@ -310,34 +324,13 @@
                     } else {
                         user = u; localStorage.setItem('podium_user', u); initApp();
                     }
-                } else { alert('DATOS INCORRECTOS.'); }
+                } else alert('DATOS INCORRECTOS.');
             } catch(e) { alert('ERROR DE CONEXIÓN'); }
             toggleLoader(false);
         }
 
-        function volverDashboard() {
-            localStorage.removeItem('podium_nivel');
-            app.nivel = '';
-            showView('view-dashboard');
-        }
-
-        function volverRegiones() {
-            localStorage.removeItem('podium_region');
-            localStorage.removeItem('podium_nivel');
-            app.region = '';
-            app.nivel = '';
-            showView('view-region');
-        }
-
-        function closeModal() { 
-            document.getElementById('modal-confirm').classList.add('hidden'); 
-            document.getElementById('btn-modal-cancel').classList.remove('hidden');
-        }
-
-        function logout() { 
-            localStorage.clear(); 
-            location.reload(); 
-        }
+        function closeModal() { document.getElementById('modal-confirm').classList.add('hidden'); }
+        function logout() { localStorage.clear(); location.reload(); }
     </script>
 </body>
 </html>
