@@ -19,10 +19,9 @@
         
         .text-huge { font-size: 1.25rem; font-weight: 900; }
         .text-pozo { font-size: 1.1rem; color: #fbbf24; font-weight: 900; }
-        .btn-modificar { background: #ef4444; color: white; font-size: 10px; padding: 6px 10px; border-radius: 6px; font-weight: 900; }
-        .btn-stats { background: #3b82f6; color: white; font-size: 10px; padding: 6px 10px; border-radius: 6px; font-weight: 900; }
+        .btn-modificar { background: #ef4444; color: white; font-size: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 900; }
+        .btn-stats { background: #3b82f6; color: white; font-size: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 900; }
         .band-disabled { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
-        .btn-cerrar-modal { border: 2px solid #334155; padding: 10px 20px; border-radius: 12px; font-weight: 900; color: #94a3b8; text-transform: uppercase; font-size: 12px; }
     </style>
 </head>
 <body class="p-4">
@@ -34,56 +33,42 @@
 
     <header id="global-header" class="hidden flex justify-between items-start mb-8">
         <div id="atras-container" class="w-16"><button id="btn-atras" class="text-[11px] font-black text-slate-500 uppercase tracking-widest pt-2">← ATRÁS</button></div>
-        <div class="text-center flex-1 text-amber-500 font-black tracking-tighter uppercase">PÓDIUM PREMIUM<p id="header-username" class="text-[10px] text-slate-400"></p></div>
-        <div class="w-16 flex justify-end"><button onclick="logout()" class="btn-logout uppercase">SALIR</button></div>
+        <div class="text-center flex-1 text-amber-500 font-black tracking-tighter uppercase">PÓDIUM PREMIUM<p id="header-username" class="text-[10px] text-slate-400 font-bold"></p></div>
+        <div class="w-16 flex justify-end"><button onclick="logout()" class="btn-logout uppercase tracking-tighter">SALIR</button></div>
     </header>
 
-    <div id="view-login" class="max-w-md mx-auto mt-20">
-        <h1 class="text-4xl font-black text-center mb-10 uppercase tracking-tighter">PÓDIUM <span class="text-amber-500">PREMIUM</span></h1>
-        <div class="premium-card p-10">
-            <input id="login-user" type="text" placeholder="USUARIO" class="w-full p-5 mb-5 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold uppercase focus:outline-none">
-            <input id="login-pass" type="password" placeholder="CONTRASEÑA" class="w-full p-5 mb-8 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold focus:outline-none">
-            <button onclick="handleLogin()" class="w-full btn-gold py-5 rounded-2xl text-lg font-black uppercase">ENTRAR</button>
-        </div>
-    </div>
-
-    <div id="view-region" class="hidden max-w-md mx-auto">
-        <h2 class="text-3xl font-black mb-10 text-center uppercase">REGIÓN</h2>
-        <div id="region-list" class="grid gap-5"></div>
-    </div>
-
     <div id="view-dashboard" class="hidden max-w-md mx-auto pb-10">
-        <p id="dash-region-tag" class="text-center text-amber-500 font-black uppercase mb-8 text-lg"></p>
+        <p id="dash-region-tag" class="text-center text-amber-500 font-black uppercase mb-8 text-lg tracking-widest"></p>
         <div class="grid gap-6">
             <div class="premium-card p-8 border-amber-500/30">
                 <p class="text-[11px] font-black text-slate-400 uppercase text-center mb-4 tracking-widest">POZO ESTIMADO</p>
                 <div class="space-y-3">
-                    <div class="flex justify-between items-center"><span class="font-bold uppercase text-xs">BÁSICO:</span><span id="pozo-basico-label" class="text-pozo">$0</span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold uppercase text-xs">MEDIO:</span><span id="pozo-medio-label" class="text-pozo">$0</span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold uppercase text-xs">ALTO:</span><span id="pozo-alto-label" class="text-pozo">$0</span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold">BÁSICO:</span><span id="pozo-basico-label" class="text-pozo">$0</span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold">MEDIO:</span><span id="pozo-medio-label" class="text-pozo">$0</span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold">ALTO:</span><span id="pozo-alto-label" class="text-pozo">$0</span></div>
                 </div>
             </div>
 
-            <div id="nivel-container-basico" class="premium-card p-8 flex flex-col items-center">
-                <button onclick="abrirNivel('Básico')" class="text-huge uppercase">NIVEL BÁSICO</button>
-                <div id="btns-basico" class="flex gap-2 mt-4 hidden">
-                    <button onclick="abrirNivel('Básico')" class="btn-modificar uppercase">MODIFICAR APUESTA</button>
+            <div id="cont-basico" class="premium-card p-8 flex flex-col items-center">
+                <button onclick="abrirNivel('Básico')" class="text-huge uppercase tracking-tighter">NIVEL BÁSICO</button>
+                <div id="btns-basico" class="flex gap-3 mt-5 hidden">
+                    <button onclick="confirmarModificar('Básico')" class="btn-modificar uppercase">MODIFICAR APUESTA</button>
                     <button onclick="verEstadisticas('basico')" class="btn-stats uppercase">ESTADÍSTICAS</button>
                 </div>
             </div>
 
-            <div id="nivel-container-medio" class="premium-card p-8 flex flex-col items-center">
-                <button onclick="abrirNivel('Medio')" class="text-huge uppercase">NIVEL MEDIO</button>
-                <div id="btns-medio" class="flex gap-2 mt-4 hidden">
-                    <button onclick="abrirNivel('Medio')" class="btn-modificar uppercase">MODIFICAR APUESTA</button>
+            <div id="cont-medio" class="premium-card p-8 flex flex-col items-center">
+                <button onclick="abrirNivel('Medio')" class="text-huge uppercase tracking-tighter">NIVEL MEDIO</button>
+                <div id="btns-medio" class="flex gap-3 mt-5 hidden">
+                    <button onclick="confirmarModificar('Medio')" class="btn-modificar uppercase">MODIFICAR APUESTA</button>
                     <button onclick="verEstadisticas('medio')" class="btn-stats uppercase">ESTADÍSTICAS</button>
                 </div>
             </div>
 
-            <div id="nivel-container-alto" class="premium-card p-8 flex flex-col items-center">
-                <button onclick="abrirNivel('Alto')" class="text-huge uppercase">NIVEL ALTO</button>
-                <div id="btns-alto" class="flex gap-2 mt-4 hidden">
-                    <button onclick="abrirNivel('Alto')" class="btn-modificar uppercase">MODIFICAR APUESTA</button>
+            <div id="cont-alto" class="premium-card p-8 flex flex-col items-center">
+                <button onclick="abrirNivel('Alto')" class="text-huge uppercase tracking-tighter">NIVEL ALTO</button>
+                <div id="btns-alto" class="flex gap-3 mt-5 hidden">
+                    <button onclick="confirmarModificar('Alto')" class="btn-modificar uppercase">MODIFICAR APUESTA</button>
                     <button onclick="verEstadisticas('alto')" class="btn-stats uppercase">ESTADÍSTICAS</button>
                 </div>
             </div>
@@ -100,17 +85,33 @@
         <div id="band-container" class="grid grid-cols-2 gap-3 max-h-[40vh] overflow-y-auto pb-24"></div>
         <div class="fixed bottom-0 left-0 w-full p-5 bg-slate-900/95 flex gap-4 backdrop-blur-md">
             <button onclick="showView('view-dashboard')" class="flex-1 border border-slate-700 py-5 rounded-2xl text-[12px] font-black uppercase">CANCELAR</button>
-            <button onclick="prepararConfirmacion()" class="flex-[2] btn-gold py-5 rounded-2xl text-[12px] font-black uppercase">CONFIRMAR</button>
+            <button onclick="prepararConfirmacion()" class="flex-[2] btn-gold py-5 rounded-2xl text-[12px] font-black uppercase shadow-lg">CONFIRMAR</button>
         </div>
     </div>
 
     <div id="modal-confirm" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center p-6 z-[110]">
         <div class="premium-card p-10 w-full max-w-sm text-center">
-            <h3 id="modal-title" class="font-black mb-6 uppercase text-xl text-white tracking-tighter"></h3>
-            <p id="modal-text" class="text-[13px] text-slate-400 mb-10 uppercase font-black leading-relaxed whitespace-pre-line"></p>
-            <div id="modal-footer" class="flex gap-5 justify-center">
-                </div>
+            <h3 id="modal-title" class="font-black mb-6 uppercase text-xl"></h3>
+            <p id="modal-text" class="text-[12px] text-slate-400 mb-10 uppercase font-bold whitespace-pre-line"></p>
+            <div id="modal-footer" class="flex gap-5">
+                <button id="btn-modal-cancel" onclick="closeModal()" class="flex-1 text-[12px] font-black uppercase text-slate-500">NO</button>
+                <button id="btn-modal-ok" class="flex-1 btn-gold py-4 rounded-xl text-[12px] font-black uppercase"></button>
+            </div>
         </div>
+    </div>
+
+    <div id="view-login" class="max-w-md mx-auto mt-20">
+        <h1 class="text-4xl font-black text-center mb-10 uppercase tracking-tighter">PÓDIUM <span class="text-amber-500">PREMIUM</span></h1>
+        <div class="premium-card p-10 shadow-2xl">
+            <input id="login-user" type="text" placeholder="USUARIO" class="w-full p-5 mb-5 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold uppercase">
+            <input id="login-pass" type="password" placeholder="CONTRASEÑA" class="w-full p-5 mb-8 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold">
+            <button onclick="handleLogin()" class="w-full btn-gold py-5 rounded-2xl text-lg font-black uppercase">ENTRAR</button>
+        </div>
+    </div>
+
+    <div id="view-region" class="hidden max-w-md mx-auto">
+        <h2 class="text-3xl font-black mb-10 text-center uppercase">REGIÓN</h2>
+        <div id="region-list" class="grid gap-5"></div>
     </div>
 
     <script>
@@ -146,7 +147,7 @@
             const c = document.getElementById('region-list'); c.innerHTML = '';
             rs.forEach(r => {
                 const b = document.createElement('button');
-                b.className = 'premium-card p-6 font-black uppercase text-lg text-center tracking-widest';
+                b.className = 'premium-card p-6 font-black uppercase text-lg text-center';
                 b.innerText = r; b.onclick = () => cargarDatosRegion(r);
                 c.appendChild(b);
             });
@@ -162,15 +163,21 @@
                 const promesas = niveles.map(n => fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData', user, region, nivel: n }) }).then(r => r.json()));
                 const resultados = await Promise.all(promesas);
                 niveles.forEach((n, i) => {
-                    const d = resultados[i];
-                    cacheData[n] = d;
+                    const d = resultados[i]; cacheData[n] = d;
                     document.getElementById(`pozo-${n}-label`).innerText = `$${(d.config?.pozo || 0).toLocaleString()}`;
                     const btnBox = document.getElementById(`btns-${n}`);
-                    if(d.miApuesta) btnBox.classList.remove('hidden');
-                    else btnBox.classList.add('hidden');
+                    if(d.miApuesta) btnBox.classList.remove('hidden'); else btnBox.classList.add('hidden');
                 });
-            } catch(e) { alert('ERROR CARGA'); }
+            } catch(e) { alert('ERROR'); }
             toggleLoader(false);
+        }
+
+        function confirmarModificar(nivelLabel) {
+            document.getElementById('modal-title').innerText = "ATENCIÓN";
+            document.getElementById('modal-text').innerText = "Vas a editar tu apuesta.\n\nEste proceso tiene un costo de $1.000 que se descontará del pozo.";
+            document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
+            document.getElementById('btn-modal-ok').onclick = () => { closeModal(); abrirNivel(nivelLabel); };
+            document.getElementById('modal-confirm').classList.remove('hidden');
         }
 
         function abrirNivel(nivelLabel) {
@@ -195,8 +202,6 @@
                 const bt = document.createElement('button');
                 bt.className = 'premium-card p-5 text-[11px] font-black uppercase leading-tight';
                 bt.innerText = b.nombre; bt.onclick = () => {
-                    const picks = [app.p1, app.p2, app.p3];
-                    if(picks.includes(b.nombre)) return; // Bloqueo de duplicados
                     if(!app.p1) app.p1 = b.nombre; else if(!app.p2) app.p2 = b.nombre; else if(!app.p3) app.p3 = b.nombre;
                     syncUI();
                 }; c.appendChild(bt);
@@ -220,39 +225,28 @@
             try {
                 const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getStats', region: app.region, nivel: n }) });
                 const d = await r.json();
-                const totalParticipantes = cacheData[n].config.participantes || 1;
-                
-                let statsText = "";
-                if(d.stats && d.stats.length > 0) {
-                    statsText = d.stats.map(s => {
-                        const porcentaje = ((s.votos / totalParticipantes) * 100).toFixed(1);
-                        return `${s.nombre}\n${porcentaje}% DE PREFERENCIA`;
-                    }).join('\n\n');
-                } else { statsText = "SIN DATOS SUFICIENTES"; }
-
+                let txt = d.stats.length > 0 ? d.stats.map(s => `- ${s.nombre}`).join('\n') : "- SIN DATOS -";
                 document.getElementById('modal-title').innerText = "ESTADÍSTICAS";
-                document.getElementById('modal-text').innerText = statsText;
-                
-                const footer = document.getElementById('modal-footer');
-                footer.innerHTML = `<button onclick="closeModal()" class="btn-cerrar-modal">CERRAR</button>`;
-                
+                document.getElementById('modal-text').innerText = "LAS DOS BANDAS MÁS SELECCIONADAS:\n" + txt;
+                document.getElementById('btn-modal-ok').innerText = "CERRAR";
+                document.getElementById('btn-modal-ok').onclick = closeModal;
+                document.getElementById('btn-modal-cancel').classList.add('hidden');
                 document.getElementById('modal-confirm').classList.remove('hidden');
-            } catch(e) { alert('ERROR STATS'); }
+            } catch(e) { alert('ERROR'); }
             toggleLoader(false);
         }
 
-        function closeModal() { document.getElementById('modal-confirm').classList.add('hidden'); }
+        function closeModal() { 
+            document.getElementById('modal-confirm').classList.add('hidden'); 
+            document.getElementById('btn-modal-cancel').classList.remove('hidden');
+        }
 
         function prepararConfirmacion() {
             if(!app.p1 || !app.p2 || !app.p3) return alert('COMPLETA EL PÓDIUM');
             document.getElementById('modal-title').innerText = "¿CONFIRMAR?";
-            document.getElementById('modal-text').innerText = app.existe ? `MODIFICAR COSTARÁ $1.000.\nINTENTOS: ${app.ediciones}` : `REGISTRAR POR $20.000.`;
-            
-            const footer = document.getElementById('modal-footer');
-            footer.innerHTML = `
-                <button onclick="closeModal()" class="text-[12px] font-black uppercase text-slate-500">NO</button>
-                <button onclick="execSave()" class="btn-gold py-4 px-8 rounded-xl text-[12px] font-black uppercase">SÍ, ENVIAR</button>
-            `;
+            document.getElementById('modal-text').innerText = app.existe ? `MODIFICAR COSTARÁ $1.000.\nINTENTOS REALIZADOS: ${app.ediciones}` : `ESTA APUESTA TIENE UN VALOR DE $20.000.`;
+            document.getElementById('btn-modal-ok').innerText = "SÍ, ENVIAR";
+            document.getElementById('btn-modal-ok').onclick = execSave;
             document.getElementById('modal-confirm').classList.remove('hidden');
         }
 
@@ -268,7 +262,6 @@
 
         function removeBand(s) { app['p'+s] = ''; syncUI(); }
         function logout() { localStorage.clear(); location.reload(); }
-
         async function handleLogin() {
             const u = document.getElementById('login-user').value.trim();
             const p = document.getElementById('login-pass').value.trim();
