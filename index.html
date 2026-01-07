@@ -10,91 +10,73 @@
         body { font-family: 'Montserrat', sans-serif; background-color: #0b0f1a; color: #f8fafc; }
         .premium-card { background: rgba(22, 28, 45, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 1.5rem; }
         .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #000; font-weight: 900; }
-        .btn-outline { border: 1px solid #475569; color: #94a3b8; font-weight: 700; }
-        .podium-slot { border: 2px dashed #334155; border-radius: 1rem; min-height: 85px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-logout { background-color: #ef4444; color: white; border-radius: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.6rem; font-weight: 900; }
+        .podium-slot { border: 2px dashed #334155; border-radius: 1rem; min-height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .slot-filled { border: 2px solid #fbbf24; background: rgba(251, 191, 36, 0.05); }
         .hidden { display: none; }
     </style>
 </head>
-<body class="p-4 pb-24">
+<body class="p-4">
 
-    <div id="view-login" class="max-w-md mx-auto mt-12">
+    <header id="global-header" class="hidden flex justify-between items-start mb-6">
+        <button id="btn-atras" class="text-[10px] font-black text-slate-500 uppercase tracking-widest pt-2">← ATRÁS</button>
+        <div class="text-center">
+            <h1 class="text-lg font-black uppercase leading-none tracking-tighter text-amber-500">PÓDIUM PREMIUM</h1>
+            <p id="header-username" class="text-[9px] font-bold text-slate-400 uppercase mt-1"></p>
+        </div>
+        <button onclick="logout()" class="btn-logout uppercase">SALIR</button>
+    </header>
+
+    <div id="view-login" class="max-w-md mx-auto mt-20">
         <h1 class="text-3xl font-black text-center mb-10 uppercase tracking-tighter">PÓDIUM <span class="text-amber-500">PREMIUM</span></h1>
         <div class="premium-card p-8 shadow-2xl">
             <input id="login-user" type="text" placeholder="USUARIO" class="w-full p-4 mb-4 rounded-xl bg-slate-900 border border-slate-800 focus:outline-none focus:border-amber-500 uppercase text-sm">
             <input id="login-pass" type="password" placeholder="CONTRASEÑA" class="w-full p-4 mb-6 rounded-xl bg-slate-900 border border-slate-800 focus:outline-none focus:border-amber-500 text-sm">
-            <button onclick="handleLogin()" class="w-full btn-gold py-4 rounded-xl shadow-lg hover:brightness-110 transition-all uppercase">ENTRAR</button>
+            <button onclick="handleLogin()" class="w-full btn-gold py-4 rounded-xl shadow-lg uppercase">ENTRAR</button>
         </div>
     </div>
 
-    <div id="view-region" class="hidden max-w-md mx-auto pt-6">
+    <div id="view-region" class="hidden max-w-md mx-auto">
         <h2 class="text-2xl font-black mb-8 uppercase text-center">SELECCIONA REGIÓN</h2>
         <div id="region-list" class="grid gap-4"></div>
     </div>
 
-    <div id="view-dashboard" class="hidden max-w-md mx-auto pt-4">
-        <button onclick="showView('view-region')" class="mb-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">← CAMBIAR REGIÓN</button>
-        
+    <div id="view-dashboard" class="hidden max-w-md mx-auto">
         <div class="premium-card p-6 mb-8 text-center border-amber-500/20">
-            <p id="dash-region-tag" class="text-[10px] text-amber-500 font-black uppercase mb-2 tracking-widest"></p>
+            <p id="dash-region-tag" class="text-[10px] text-amber-500 font-black uppercase mb-1"></p>
             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">POZO ESTIMADO</p>
             <h3 id="dash-pozo" class="text-4xl font-black text-white">$0</h3>
-            <p id="dash-participantes" class="text-[10px] mt-2 font-bold uppercase text-slate-500 tracking-tighter">CARGANDO DATOS...</p>
+            <p id="dash-participantes" class="text-[10px] mt-2 font-bold uppercase text-slate-500 italic">CARGANDO...</p>
         </div>
-
         <div class="grid gap-4">
-            <button onclick="abrirNivel('Básico')" class="premium-card p-6 flex justify-between items-center hover:bg-slate-800/40">
-                <span class="font-black uppercase tracking-tight">NIVEL BÁSICO</span>
-                <span class="text-amber-500 font-black">→</span>
-            </button>
-            <button onclick="abrirNivel('Medio')" class="premium-card p-6 flex justify-between items-center hover:bg-slate-800/40">
-                <span class="font-black uppercase tracking-tight">NIVEL MEDIO</span>
-                <span class="text-amber-500 font-black">→</span>
-            </button>
-            <button onclick="abrirNivel('Alto')" class="premium-card p-6 flex justify-between items-center hover:bg-slate-800/40">
-                <span class="font-black uppercase tracking-tight">NIVEL ALTO</span>
-                <span class="text-amber-500 font-black">→</span>
-            </button>
+            <button onclick="abrirNivel('Básico')" class="premium-card p-6 flex justify-between items-center"><span class="font-black uppercase">NIVEL BÁSICO</span><span class="text-amber-500 font-black">→</span></button>
+            <button onclick="abrirNivel('Medio')" class="premium-card p-6 flex justify-between items-center"><span class="font-black uppercase">NIVEL MEDIO</span><span class="text-amber-500 font-black">→</span></button>
+            <button onclick="abrirNivel('Alto')" class="premium-card p-6 flex justify-between items-center"><span class="font-black uppercase">NIVEL ALTO</span><span class="text-amber-500 font-black">→</span></button>
         </div>
     </div>
 
-    <div id="view-podium" class="hidden max-w-md mx-auto pt-4">
+    <div id="view-podium" class="hidden max-w-md mx-auto">
         <div class="flex justify-between items-center mb-6">
             <h2 id="podium-header" class="text-xl font-black uppercase text-amber-500"></h2>
-            <div id="edit-badge" class="hidden bg-red-500/20 text-red-500 text-[9px] px-2 py-1 rounded-full font-black uppercase">EDICIÓN ACTIVA</div>
+            <div id="edit-badge" class="hidden bg-red-500/20 text-red-500 text-[9px] px-2 py-1 rounded-full font-black">EDICIÓN</div>
         </div>
-
-        <div class="grid grid-cols-3 gap-3 mb-8">
-            <div onclick="removeBand(1)" id="slot-1" class="podium-slot flex-col p-2 text-center">
-                <span class="text-[9px] font-black text-amber-500/50 uppercase block mb-1">1° LUGAR</span>
-                <span id="txt-p1" class="text-[10px] font-black uppercase leading-none">VACÍO</span>
-            </div>
-            <div onclick="removeBand(2)" id="slot-2" class="podium-slot flex-col p-2 text-center">
-                <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">2° LUGAR</span>
-                <span id="txt-p2" class="text-[10px] font-black uppercase leading-none">VACÍO</span>
-            </div>
-            <div onclick="removeBand(3)" id="slot-3" class="podium-slot flex-col p-2 text-center">
-                <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">3° LUGAR</span>
-                <span id="txt-p3" class="text-[10px] font-black uppercase leading-none">VACÍO</span>
-            </div>
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div onclick="removeBand(1)" id="slot-1" class="podium-slot flex-col p-2 text-center"><span class="text-[8px] font-black text-amber-500/50 block">1°</span><span id="txt-p1" class="text-[9px] font-black uppercase">VACÍO</span></div>
+            <div onclick="removeBand(2)" id="slot-2" class="podium-slot flex-col p-2 text-center"><span class="text-[8px] font-black text-slate-500 block">2°</span><span id="txt-p2" class="text-[9px] font-black uppercase">VACÍO</span></div>
+            <div onclick="removeBand(3)" id="slot-3" class="podium-slot flex-col p-2 text-center"><span class="text-[8px] font-black text-slate-500 block">3°</span><span id="txt-p3" class="text-[9px] font-black uppercase">VACÍO</span></div>
         </div>
-
-        <div id="band-container" class="grid grid-cols-2 gap-2 max-h-[45vh] overflow-y-auto pr-2"></div>
-
-        <div class="fixed bottom-0 left-0 w-full p-4 bg-slate-900/90 backdrop-blur-xl border-t border-white/5 flex gap-3">
-            <button onclick="showView('view-dashboard')" class="flex-1 btn-outline py-4 rounded-xl text-xs uppercase tracking-widest">CANCELAR</button>
-            <button id="btn-confirmar" onclick="prepararConfirmacion()" class="flex-[2] btn-gold py-4 rounded-xl text-xs uppercase tracking-widest shadow-lg">CONFIRMAR</button>
+        <div id="band-container" class="grid grid-cols-2 gap-2 max-h-[40vh] overflow-y-auto pr-2"></div>
+        <div class="fixed bottom-0 left-0 w-full p-4 bg-slate-900/90 flex gap-3">
+            <button onclick="regresarDashboard()" class="flex-1 border border-slate-700 py-4 rounded-xl text-[10px] font-black uppercase">CANCELAR</button>
+            <button id="btn-confirmar" onclick="prepararConfirmacion()" class="flex-[2] btn-gold py-4 rounded-xl text-[10px] font-black uppercase shadow-lg">CONFIRMAR</button>
         </div>
     </div>
 
-    <div id="modal-confirm" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center p-6 z-50">
+    <div id="modal-confirm" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center p-6 z-50">
         <div class="premium-card p-8 w-full max-w-sm text-center">
-            <h3 class="font-black mb-4 uppercase">¿CONFIRMAR ACCIÓN?</h3>
-            <p id="modal-text" class="text-[10px] text-slate-400 mb-8 uppercase leading-relaxed"></p>
-            <div class="flex gap-4">
-                <button onclick="closeModal()" class="flex-1 text-xs font-black uppercase text-slate-500">NO</button>
-                <button onclick="execSave()" class="flex-1 btn-gold py-3 rounded-xl text-xs uppercase">SÍ, ENVIAR</button>
-            </div>
+            <h3 class="font-black mb-4 uppercase">¿CONFIRMAR?</h3>
+            <p id="modal-text" class="text-[10px] text-slate-400 mb-8 uppercase"></p>
+            <div class="flex gap-4"><button onclick="closeModal()" class="flex-1 text-[10px] font-black uppercase">NO</button><button onclick="execSave()" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase">SÍ</button></div>
         </div>
     </div>
 
@@ -104,39 +86,50 @@
         let app = { region: '', nivel: '', p1: '', p2: '', p3: '', ediciones: 0, existe: false };
         let bandasRaw = [];
 
-        if (user) { showView('view-region'); loadRegions(); }
+        if (user) { initApp(); }
+
+        function initApp() {
+            document.getElementById('header-username').innerText = user;
+            document.getElementById('global-header').classList.remove('hidden');
+            showView('view-region');
+            loadRegions();
+        }
 
         function showView(id) {
             document.querySelectorAll('div[id^="view-"]').forEach(v => v.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
+            const btnAtras = document.getElementById('btn-atras');
+            if(id === 'view-region') btnAtras.onclick = () => alert("YA ESTÁS EN EL INICIO");
+            if(id === 'view-dashboard') btnAtras.onclick = () => showView('view-region');
+            if(id === 'view-podium') btnAtras.onclick = () => showView('view-dashboard');
         }
 
         async function handleLogin() {
-            const u = document.getElementById('login-user').value;
-            const p = document.getElementById('login-pass').value;
+            const u = document.getElementById('login-user').value.trim();
+            const p = document.getElementById('login-pass').value.trim();
             if(!u || !p) return;
             const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user: u, pass: p }) });
             const data = await res.json();
-            if(data.success) { user = u; localStorage.setItem('podium_user', u); showView('view-region'); loadRegions(); }
-            else alert('CREDENCIALES INVÁLIDAS');
+            if(data.success) { user = u; localStorage.setItem('podium_user', u); initApp(); }
+            else alert('DATOS INCORRECTOS');
         }
+
+        function logout() { localStorage.clear(); location.reload(); }
 
         function loadRegions() {
             const rs = ['NORTE', 'CENTRO-SUR', 'ORIENTE', 'MAGDALENA CALDENSE', 'OCCIDENTE PROSPERO', 'ALTO OCCIDENTE'];
-            const container = document.getElementById('region-list');
-            container.innerHTML = '';
+            const container = document.getElementById('region-list'); container.innerHTML = '';
             rs.forEach(r => {
                 const btn = document.createElement('button');
-                btn.className = 'premium-card p-5 font-black uppercase text-sm hover:border-amber-500 transition-all';
-                btn.innerText = r;
-                btn.onclick = () => { app.region = r; showView('view-dashboard'); refreshDash(); };
+                btn.className = 'premium-card p-5 font-black uppercase text-sm hover:border-amber-500';
+                btn.innerText = r; btn.onclick = () => { app.region = r; showView('view-dashboard'); refreshDash(); };
                 container.appendChild(btn);
             });
         }
 
         async function refreshDash() {
             document.getElementById('dash-region-tag').innerText = app.region;
-            const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData', user, region: app.region, nivel: app.nivel || 'Básico' }) });
+            const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData', user, region: app.region, nivel: 'Básico' }) });
             const data = await res.json();
             bandasRaw = data.bandas;
             document.getElementById('dash-pozo').innerText = '$' + data.config.pozo.toLocaleString();
@@ -144,91 +137,53 @@
         }
 
         async function abrirNivel(n) {
-            app.nivel = n;
-            app.p1 = app.p2 = app.p3 = '';
+            app.nivel = n; app.p1 = app.p2 = app.p3 = '';
             document.getElementById('podium-header').innerText = n;
-            
             const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData', user, region: app.region, nivel: n }) });
             const data = await res.json();
-            
             if(data.miApuesta) {
                 app.p1 = data.miApuesta.p1; app.p2 = data.miApuesta.p2; app.p3 = data.miApuesta.p3;
-                app.ediciones = data.miApuesta.ediciones;
-                app.existe = true;
+                app.ediciones = data.miApuesta.ediciones; app.existe = true;
                 document.getElementById('edit-badge').classList.remove('hidden');
-            } else {
-                app.existe = false;
-                document.getElementById('edit-badge').classList.add('hidden');
-            }
-
-            renderBandas();
-            syncUI();
-            showView('view-podium');
+            } else { app.existe = false; document.getElementById('edit-badge').classList.add('hidden'); }
+            renderBandas(); syncUI(); showView('view-podium');
         }
 
         function renderBandas() {
-            const container = document.getElementById('band-container');
-            container.innerHTML = '';
+            const container = document.getElementById('band-container'); container.innerHTML = '';
             bandasRaw.filter(b => b.region.toUpperCase() === app.region && b.nivel === app.nivel).forEach(b => {
                 const btn = document.createElement('button');
-                btn.className = 'premium-card p-4 text-[10px] font-bold uppercase leading-tight';
-                btn.innerText = b.nombre;
-                btn.onclick = () => {
-                    if(!app.p1) app.p1 = b.nombre;
-                    else if(!app.p2) app.p2 = b.nombre;
-                    else if(!app.p3) app.p3 = b.nombre;
+                btn.className = 'premium-card p-4 text-[9px] font-black uppercase leading-tight';
+                btn.innerText = b.nombre; btn.onclick = () => {
+                    if(!app.p1) app.p1 = b.nombre; else if(!app.p2) app.p2 = b.nombre; else if(!app.p3) app.p3 = b.nombre;
                     syncUI();
-                };
-                container.appendChild(btn);
+                }; container.appendChild(btn);
             });
         }
 
-        function removeBand(slot) {
-            app['p'+slot] = '';
-            syncUI();
-        }
-
+        function removeBand(slot) { app['p'+slot] = ''; syncUI(); }
         function syncUI() {
             for(let i=1; i<=3; i++) {
-                const el = document.getElementById('txt-p'+i);
-                const slot = document.getElementById('slot-'+i);
-                el.innerText = app['p'+i] || 'VACÍO';
-                app['p'+i] ? slot.classList.add('slot-filled') : slot.classList.remove('slot-filled');
+                document.getElementById('txt-p'+i).innerText = app['p'+i] || 'VACÍO';
+                document.getElementById('slot-'+i).className = `podium-slot flex-col p-2 text-center ${app['p'+i] ? 'slot-filled' : ''}`;
             }
         }
 
         function closeModal() { document.getElementById('modal-confirm').classList.add('hidden'); }
+        function regresarDashboard() { showView('view-dashboard'); }
 
         function prepararConfirmacion() {
             if(!app.p1 || !app.p2 || !app.p3) return alert('COMPLETA EL PÓDIUM');
-            const msg = app.existe 
-                ? `ESTÁS EDITANDO TU APUESTA. ESTO RESTARÁ $1.000 DEL PREMIO TOTAL. TE QUEDAN ${3 - app.ediciones} EDICIONES.`
-                : `SE REGISTRARÁ TU APUESTA POR VALOR DE $20.000. ¿DESEAS CONTINUAR?`;
-            
-            if(app.existe && app.ediciones >= 3) return alert('HAS AGOTADO TUS 3 EDICIONES');
-            
+            if(app.existe && app.ediciones >= 3) return alert('MÁXIMO DE EDICIONES ALCANZADO');
+            const msg = app.existe ? `EDITAR RESTARÁ $1.000. INTENTOS RESTANTES: ${3 - app.ediciones}` : `REGISTRAR APUESTA POR $20.000.`;
             document.getElementById('modal-text').innerText = msg;
             document.getElementById('modal-confirm').classList.remove('hidden');
         }
 
         async function execSave() {
             closeModal();
-            const btn = document.getElementById('btn-confirmar');
-            btn.innerText = 'ENVIANDO...';
-            btn.disabled = true;
-
-            const res = await fetch(API, { 
-                method: 'POST', 
-                body: JSON.stringify({ action: 'saveApuesta', user, region: app.region, categoria: app.nivel, p1: app.p1, p2: app.p2, p3: app.p3 }) 
-            });
-            
-            if(res.ok) {
-                alert('¡ACCIÓN REALIZADA CON ÉXITO!');
-                showView('view-dashboard');
-                refreshDash();
-            }
-            btn.innerText = 'CONFIRMAR';
-            btn.disabled = false;
+            const res = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'saveApuesta', user, region: app.region, categoria: app.nivel, p1: app.p1, p2: app.p2, p3: app.p3 }) });
+            if(res.ok) { alert('REGISTRADO'); showView('view-dashboard'); refreshDash(); }
         }
     </script>
 </body>
