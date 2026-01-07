@@ -10,106 +10,102 @@
         body { font-family: 'Montserrat', sans-serif; background-color: #0b0f1a; color: #f8fafc; overflow-x: hidden; }
         .premium-card { background: rgba(22, 28, 45, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 1.5rem; }
         .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #000; font-weight: 900; }
-        .btn-logout { background-color: #ef4444; color: white; border-radius: 0.5rem; padding: 0.3rem 0.6rem; font-size: 0.65rem; font-weight: 900; }
-        .podium-slot { border: 2px dashed #334155; border-radius: 1rem; min-height: 75px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-logout { background-color: #ef4444; color: white; border-radius: 0.5rem; padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 900; }
+        .podium-slot { border: 2px dashed #334155; border-radius: 1rem; min-height: 80px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .slot-filled { border: 2px solid #fbbf24; background: rgba(251, 191, 36, 0.05); }
         .hidden { display: none; }
-        .loader { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: #fbbf24; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .loader { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: #fbbf24; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .badge-edit { background: #ef4444; color: white; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 900; margin-left: 8px; }
+        .text-huge { font-size: 1.25rem; font-weight: 900; }
+        .text-pozo { font-size: 1.1rem; color: #fbbf24; font-weight: 900; }
+        .badge-modificar { background: #ef4444; color: white; font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 900; display: block; margin-top: 8px; text-align: center; }
     </style>
 </head>
 <body class="p-4">
 
     <div id="loading-overlay" class="hidden fixed inset-0 bg-black/80 z-[100] flex flex-col items-center justify-center">
         <div class="loader mb-4"></div>
-        <p class="text-[10px] font-black uppercase tracking-widest text-amber-500">PROCESANDO...</p>
+        <p class="text-[12px] font-black uppercase tracking-widest text-amber-500">CARGANDO DATOS...</p>
     </div>
 
-    <header id="global-header" class="hidden flex justify-between items-start mb-6">
-        <div id="atras-container" class="w-16"><button id="btn-atras" class="text-[10px] font-black text-slate-500 uppercase tracking-widest pt-2">← ATRÁS</button></div>
+    <header id="global-header" class="hidden flex justify-between items-start mb-8">
+        <div id="atras-container" class="w-16"><button id="btn-atras" class="text-[11px] font-black text-slate-500 uppercase tracking-widest pt-2">← ATRÁS</button></div>
         <div class="text-center flex-1">
-            <h1 class="text-lg font-black uppercase tracking-tighter text-amber-500">PÓDIUM PREMIUM</h1>
-            <p id="header-username" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest"></p>
+            <h1 class="text-xl font-black uppercase tracking-tighter text-amber-500">PÓDIUM PREMIUM</h1>
+            <p id="header-username" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"></p>
         </div>
         <div class="w-16 flex justify-end"><button onclick="logout()" class="btn-logout uppercase">SALIR</button></div>
     </header>
 
     <div id="view-login" class="max-w-md mx-auto mt-20">
-        <h1 class="text-3xl font-black text-center mb-10 uppercase tracking-tighter">PÓDIUM <span class="text-amber-500">PREMIUM</span></h1>
-        <div class="premium-card p-8 shadow-2xl">
-            <input id="login-user" type="text" placeholder="USUARIO" class="w-full p-4 mb-4 rounded-xl bg-slate-900 border border-slate-800 text-sm font-bold uppercase focus:outline-none">
-            <input id="login-pass" type="password" placeholder="CONTRASEÑA" class="w-full p-4 mb-6 rounded-xl bg-slate-900 border border-slate-800 text-sm font-bold focus:outline-none">
-            <button onclick="handleLogin()" class="w-full btn-gold py-4 rounded-xl shadow-lg uppercase font-black">ENTRAR</button>
+        <h1 class="text-4xl font-black text-center mb-10 uppercase tracking-tighter">PÓDIUM <span class="text-amber-500">PREMIUM</span></h1>
+        <div class="premium-card p-10 shadow-2xl">
+            <input id="login-user" type="text" placeholder="USUARIO" class="w-full p-5 mb-5 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold uppercase focus:outline-none">
+            <input id="login-pass" type="password" placeholder="CONTRASEÑA" class="w-full p-5 mb-8 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold focus:outline-none">
+            <button onclick="handleLogin()" class="w-full btn-gold py-5 rounded-2xl shadow-lg uppercase text-lg font-black tracking-widest">ENTRAR</button>
         </div>
     </div>
 
     <div id="view-region" class="hidden max-w-md mx-auto">
-        <h2 class="text-2xl font-black mb-8 uppercase text-center tracking-tight">SELECCIONA REGIÓN</h2>
-        <div id="region-list" class="grid gap-4"></div>
+        <h2 class="text-3xl font-black mb-10 uppercase text-center tracking-tight">SELECCIONA REGIÓN</h2>
+        <div id="region-list" class="grid gap-5"></div>
     </div>
 
-    <div id="view-dashboard" class="hidden max-w-md mx-auto">
-        <p id="dash-region-tag" class="text-center text-amber-500 font-black uppercase mb-6 tracking-widest text-sm"></p>
-        <div class="grid gap-4">
-            <button onclick="abrirNivel('Básico')" class="premium-card p-6 flex justify-between items-center text-left">
-                <div>
-                    <div class="flex items-center">
-                        <span class="font-black uppercase tracking-tight text-sm">NIVEL BÁSICO</span>
-                        <span id="badge-basico" class="badge-edit hidden">EDITAR</span>
-                    </div>
-                    <p id="pozo-basico" class="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-tighter">CARGANDO POZO...</p>
+    <div id="view-dashboard" class="hidden max-w-md mx-auto pb-10">
+        <p id="dash-region-tag" class="text-center text-amber-500 font-black uppercase mb-8 tracking-widest text-lg"></p>
+        
+        <div class="grid gap-6">
+            <div class="premium-card p-8 border-amber-500/30">
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 text-center">POZO ESTIMADO DISCRIMINADO</p>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center"><span class="font-bold text-sm">BÁSICO:</span><span id="pozo-basico-label" class="text-pozo">$0</span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-sm">MEDIO:</span><span id="pozo-medio-label" class="text-pozo">$0</span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-sm">ALTO:</span><span id="pozo-alto-label" class="text-pozo">$0</span></div>
                 </div>
-                <span class="text-amber-500 font-black">→</span>
+            </div>
+
+            <button onclick="abrirNivel('Básico')" class="premium-card p-8 flex flex-col items-center justify-center text-center hover:bg-slate-800/50">
+                <span class="text-huge uppercase">NIVEL BÁSICO</span>
+                <span id="mod-basico" class="badge-modificar hidden">MODIFICAR APUESTA</span>
             </button>
-            <button onclick="abrirNivel('Medio')" class="premium-card p-6 flex justify-between items-center text-left">
-                <div>
-                    <div class="flex items-center">
-                        <span class="font-black uppercase tracking-tight text-sm">NIVEL MEDIO</span>
-                        <span id="badge-medio" class="badge-edit hidden">EDITAR</span>
-                    </div>
-                    <p id="pozo-medio" class="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-tighter">CARGANDO POZO...</p>
-                </div>
-                <span class="text-amber-500 font-black">→</span>
+
+            <button onclick="abrirNivel('Medio')" class="premium-card p-8 flex flex-col items-center justify-center text-center hover:bg-slate-800/50">
+                <span class="text-huge uppercase">NIVEL MEDIO</span>
+                <span id="mod-medio" class="badge-modificar hidden">MODIFICAR APUESTA</span>
             </button>
-            <button onclick="abrirNivel('Alto')" class="premium-card p-6 flex justify-between items-center text-left">
-                <div>
-                    <div class="flex items-center">
-                        <span class="font-black uppercase tracking-tight text-sm">NIVEL ALTO</span>
-                        <span id="badge-alto" class="badge-edit hidden">EDITAR</span>
-                    </div>
-                    <p id="pozo-alto" class="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-tighter">CARGANDO POZO...</p>
-                </div>
-                <span class="text-amber-500 font-black">→</span>
+
+            <button onclick="abrirNivel('Alto')" class="premium-card p-8 flex flex-col items-center justify-center text-center hover:bg-slate-800/50">
+                <span class="text-huge uppercase">NIVEL ALTO</span>
+                <span id="mod-alto" class="badge-modificar hidden">MODIFICAR APUESTA</span>
             </button>
         </div>
     </div>
 
     <div id="view-podium" class="hidden max-w-md mx-auto">
-        <h2 id="podium-header" class="text-center text-xl font-black uppercase text-amber-500 tracking-tighter mb-6"></h2>
+        <h2 id="podium-header" class="text-center text-2xl font-black uppercase text-amber-500 tracking-tighter mb-8"></h2>
         
-        <div class="grid grid-cols-3 gap-3 mb-6">
-            <div onclick="removeBand(1)" id="slot-1" class="podium-slot flex-col p-2 text-center"><span class="text-[7px] font-black text-amber-500/50 block">1°</span><span id="txt-p1" class="text-[9px] font-black uppercase leading-tight">VACÍO</span></div>
-            <div onclick="removeBand(2)" id="slot-2" class="podium-slot flex-col p-2 text-center"><span class="text-[7px] font-black text-slate-500 block">2°</span><span id="txt-p2" class="text-[9px] font-black uppercase leading-tight">VACÍO</span></div>
-            <div onclick="removeBand(3)" id="slot-3" class="podium-slot flex-col p-2 text-center"><span class="text-[7px] font-black text-slate-500 block">3°</span><span id="txt-p3" class="text-[9px] font-black uppercase leading-tight">VACÍO</span></div>
+        <div class="grid grid-cols-3 gap-4 mb-8">
+            <div onclick="removeBand(1)" id="slot-1" class="podium-slot flex-col p-2 text-center"><span class="text-[9px] font-black text-amber-500/50 block">1°</span><span id="txt-p1" class="text-[11px] font-black uppercase leading-tight">VACÍO</span></div>
+            <div onclick="removeBand(2)" id="slot-2" class="podium-slot flex-col p-2 text-center"><span class="text-[9px] font-black text-slate-500 block">2°</span><span id="txt-p2" class="text-[11px] font-black uppercase leading-tight">VACÍO</span></div>
+            <div onclick="removeBand(3)" id="slot-3" class="podium-slot flex-col p-2 text-center"><span class="text-[9px] font-black text-slate-500 block">3°</span><span id="txt-p3" class="text-[11px] font-black uppercase leading-tight">VACÍO</span></div>
         </div>
 
-        <div id="band-container" class="grid grid-cols-2 gap-2 max-h-[40vh] overflow-y-auto pb-20"></div>
+        <div id="band-container" class="grid grid-cols-2 gap-3 max-h-[40vh] overflow-y-auto pb-24"></div>
 
-        <div class="fixed bottom-0 left-0 w-full p-4 bg-slate-900/95 flex gap-3 backdrop-blur-md">
-            <button onclick="showView('view-dashboard')" class="flex-1 border border-slate-700 py-4 rounded-xl text-[10px] font-black uppercase">CANCELAR</button>
-            <button onclick="prepararConfirmacion()" class="flex-[2] btn-gold py-4 rounded-xl text-[10px] font-black uppercase shadow-lg">CONFIRMAR</button>
+        <div class="fixed bottom-0 left-0 w-full p-5 bg-slate-900/95 flex gap-4 backdrop-blur-md">
+            <button onclick="showView('view-dashboard')" class="flex-1 border border-slate-700 py-5 rounded-2xl text-[12px] font-black uppercase">CANCELAR</button>
+            <button onclick="prepararConfirmacion()" class="flex-[2] btn-gold py-5 rounded-2xl text-[12px] font-black uppercase shadow-lg tracking-widest">CONFIRMAR</button>
         </div>
     </div>
 
     <div id="modal-confirm" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center p-6 z-[110]">
-        <div class="premium-card p-8 w-full max-w-sm text-center">
-            <h3 class="font-black mb-4 uppercase text-lg text-white">¿CONFIRMAR?</h3>
-            <p id="modal-text" class="text-[10px] text-slate-400 mb-8 uppercase leading-relaxed font-bold"></p>
-            <div class="flex gap-4">
-                <button onclick="closeModal()" class="flex-1 text-[10px] font-black uppercase text-slate-500">NO</button>
-                <button onclick="execSave()" class="flex-1 btn-gold py-3 rounded-xl text-[10px] font-black uppercase">SÍ, ENVIAR</button>
+        <div class="premium-card p-10 w-full max-w-sm text-center">
+            <h3 class="font-black mb-6 uppercase text-xl text-white">¿CONFIRMAR?</h3>
+            <p id="modal-text" class="text-[12px] text-slate-400 mb-10 uppercase leading-relaxed font-bold"></p>
+            <div class="flex gap-5">
+                <button onclick="closeModal()" class="flex-1 text-[12px] font-black uppercase text-slate-500">NO</button>
+                <button onclick="execSave()" class="flex-1 btn-gold py-4 rounded-xl text-[12px] font-black uppercase">SÍ, ENVIAR</button>
             </div>
         </div>
     </div>
@@ -142,14 +138,12 @@
             }
         }
 
-        function logout() { localStorage.clear(); location.reload(); }
-
         function renderRegiones() {
-            const rs = ['NORTE', 'CENTRO-SUR', 'ORIENTE', 'MAGDALENA CALDENSE', 'OCCIDENTE PROSPERO', 'ALTO OCCIDENTE'].sort((a,b) => a.length - b.length);
+            const rs = ['NORTE', 'ORIENTE', 'CENTRO-SUR', 'OCCIDENTE PRÓSPERO', 'MAGDALENA CALDENSE', 'ALTO OCCIDENTE'];
             const c = document.getElementById('region-list'); c.innerHTML = '';
             rs.forEach(r => {
                 const b = document.createElement('button');
-                b.className = 'premium-card p-5 font-black uppercase text-sm tracking-widest';
+                b.className = 'premium-card p-6 font-black uppercase text-lg tracking-widest text-center';
                 b.innerText = r; b.onclick = () => cargarDatosRegion(r);
                 c.appendChild(b);
             });
@@ -162,23 +156,20 @@
             toggleLoader(true);
             
             const niveles = ['basico', 'medio', 'alto'];
-            
             try {
-                // Consultamos los 3 niveles en paralelo para velocidad
                 const promesas = niveles.map(n => fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData', user, region, nivel: n }) }).then(r => r.json()));
                 const resultados = await Promise.all(promesas);
                 
                 niveles.forEach((n, i) => {
                     const d = resultados[i];
                     cacheData[n] = d;
-                    document.getElementById(`pozo-${n}`).innerText = `ESTIMADO: $${(d.config?.pozo || 0).toLocaleString()}`;
+                    document.getElementById(`pozo-${n}-label`).innerText = `$${(d.config?.pozo || 0).toLocaleString()}`;
                     
-                    // Mostrar etiqueta EDITAR si existe apuesta
-                    const badge = document.getElementById(`badge-${n}`);
+                    const badge = document.getElementById(`mod-${n}`);
                     if(d.miApuesta) badge.classList.remove('hidden');
                     else badge.classList.add('hidden');
                 });
-            } catch(e) { alert('ERROR AL SINCRONIZAR POZOS'); }
+            } catch(e) { alert('ERROR AL CARGAR POZOS'); }
             toggleLoader(false);
         }
 
@@ -186,11 +177,10 @@
             app.nivel = nivelLabel;
             const nNorm = nivelLabel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             const d = cacheData[nNorm];
-            
-            if(!d) return alert('CARGANDO DATOS, ESPERA UN SEGUNDO...');
+            if(!d) return;
 
             app.p1 = app.p2 = app.p3 = '';
-            document.getElementById('podium-header').innerText = `${app.region} - ${nivelLabel.toUpperCase()}`;
+            document.getElementById('podium-header').innerText = `${nivelLabel.toUpperCase()}`;
 
             if(d.miApuesta) {
                 app.p1 = d.miApuesta.p1; app.p2 = d.miApuesta.p2; app.p3 = d.miApuesta.p3;
@@ -210,7 +200,7 @@
             );
             f.forEach(b => {
                 const bt = document.createElement('button');
-                bt.className = 'premium-card p-4 text-[9px] font-black uppercase leading-tight';
+                bt.className = 'premium-card p-5 text-[11px] font-black uppercase leading-tight';
                 bt.innerText = b.nombre; bt.onclick = () => {
                     if(!app.p1) app.p1 = b.nombre; else if(!app.p2) app.p2 = b.nombre; else if(!app.p3) app.p3 = b.nombre;
                     syncUI();
@@ -219,16 +209,15 @@
         }
 
         function syncUI() {
-            for(let i=1; i<=3; i++) {
-                document.getElementById('txt-p1').innerText = app.p1 || 'VACÍO';
-                document.getElementById('txt-p2').innerText = app.p2 || 'VACÍO';
-                document.getElementById('txt-p3').innerText = app.p3 || 'VACÍO';
-                document.getElementById(`slot-${i}`).className = `podium-slot flex-col p-2 text-center ${app['p'+i] ? 'slot-filled' : ''}`;
-            }
+            document.getElementById('txt-p1').innerText = app.p1 || 'VACÍO';
+            document.getElementById('txt-p2').innerText = app.p2 || 'VACÍO';
+            document.getElementById('txt-p3').innerText = app.p3 || 'VACÍO';
+            for(let i=1; i<=3; i++) document.getElementById(`slot-${i}`).className = `podium-slot flex-col p-2 text-center ${app['p'+i] ? 'slot-filled' : ''}`;
         }
 
         function removeBand(s) { app['p'+s] = ''; syncUI(); }
         function closeModal() { document.getElementById('modal-confirm').classList.add('hidden'); }
+        function logout() { localStorage.clear(); location.reload(); }
 
         async function handleLogin() {
             const u = document.getElementById('login-user').value.trim();
@@ -246,7 +235,7 @@
 
         function prepararConfirmacion() {
             if(!app.p1 || !app.p2 || !app.p3) return alert('COMPLETA EL PÓDIUM');
-            const msg = app.existe ? `EDITAR COSTARÁ $1.000. INTENTOS: ${app.ediciones}` : `REGISTRAR POR $20.000.`;
+            const msg = app.existe ? `MODIFICAR COSTARÁ $1.000. INTENTOS REALIZADOS: ${app.ediciones}` : `REGISTRAR POR $20.000.`;
             document.getElementById('modal-text').innerText = msg;
             document.getElementById('modal-confirm').classList.remove('hidden');
         }
