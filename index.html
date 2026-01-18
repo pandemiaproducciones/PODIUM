@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PÓDIUM PREMIUM v2.1</title>
+    <title>PÓDIUM PREMIUM v2.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -22,10 +22,12 @@
         .btn-stats { background: #3b82f6; color: white; font-size: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 900; }
         .band-disabled { opacity: 0.2 !important; pointer-events: none !important; filter: grayscale(1); }
         
+        /* BOTÓN RESULTADOS CONTEXTUAL */
         .btn-results-locked { background: rgba(51, 65, 85, 0.3); color: rgba(148, 163, 184, 0.4); border: 1px solid rgba(255,255,255,0.02); cursor: not-allowed; }
-        .btn-results-active { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; font-weight: 900; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); }
+        .btn-results-active { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; font-weight: 900; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2); }
+        
         .region-closed { opacity: 0.5; position: relative; }
-        .region-closed::after { content: 'APUESTAS CERRADAS'; position: absolute; top: 10px; right: 15px; font-size: 7px; background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 900; }
+        .region-closed::after { content: 'CERRADA'; position: absolute; top: 10px; right: 15px; font-size: 7px; background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 900; }
     </style>
 </head>
 <body class="p-4">
@@ -37,13 +39,14 @@
 
     <header id="global-header" class="hidden flex justify-between items-start mb-8">
         <div id="atras-container" class="w-16"><button id="btn-atras" class="text-[11px] font-black text-slate-500 uppercase tracking-widest pt-2">← ATRÁS</button></div>
-        <div class="text-center flex-1 text-amber-500 font-black tracking-tighter uppercase">PÓDIUM PREMIUM v2.1<p id="header-username" class="text-[10px] text-slate-400 font-bold"></p></div>
+        <div class="text-center flex-1 text-amber-500 font-black tracking-tighter uppercase">PÓDIUM PREMIUM v2.3<p id="header-username" class="text-[10px] text-slate-400 font-bold"></p></div>
         <div class="w-16 flex justify-end"><button onclick="logout()" class="btn-logout uppercase tracking-tighter">SALIR</button></div>
     </header>
 
     <!-- VISTA LOGIN -->
     <div id="view-login" class="max-w-md mx-auto mt-20">
-        <h1 class="text-4xl font-black text-center mb-10 uppercase tracking-tighter">PÓDIUM <span class="text-amber-500">PREMIUM</span></h1>
+        <h1 class="text-4xl font-black text-center mb-1 uppercase tracking-tighter">PÓDIUM <span class="text-amber-500">PREMIUM</span></h1>
+        <p class="text-center text-[10px] font-black text-slate-600 mb-10 tracking-[0.3em]">VERSIÓN 2.3</p>
         <div class="premium-card p-10 shadow-2xl">
             <input id="login-user" type="text" placeholder="USUARIO" class="w-full p-5 mb-5 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold uppercase outline-none focus:border-amber-500">
             <input id="login-pass" type="password" placeholder="CONTRASEÑA" class="w-full p-5 mb-8 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold outline-none focus:border-amber-500">
@@ -53,22 +56,11 @@
 
     <!-- VISTA REGIONES -->
     <div id="view-region" class="hidden max-w-md mx-auto">
-        <h2 class="text-3xl font-black mb-10 text-center uppercase tracking-tight">REGIÓN</h2>
+        <h2 class="text-3xl font-black mb-10 text-center uppercase tracking-tight">SELECCIONA REGIÓN</h2>
         <div id="region-list" class="grid gap-4 mb-10"></div>
-        <div class="border-t border-slate-800 pt-8 pb-10">
-            <button onclick="abrirResultados()" id="btn-main-results" class="premium-card w-full p-6 font-black uppercase text-lg text-center transition-all">
-                RESULTADOS
-            </button>
-        </div>
     </div>
 
-    <!-- VISTA RESULTADOS OFICIALES -->
-    <div id="view-resultados" class="hidden max-w-md mx-auto pb-10">
-        <h2 class="text-3xl font-black mb-8 text-center uppercase tracking-tighter text-amber-500">GANADORES OFICIALES</h2>
-        <div id="resultados-lista" class="space-y-6"></div>
-    </div>
-
-    <!-- DASHBOARD NIVELES -->
+    <!-- VISTA DASHBOARD -->
     <div id="view-dashboard" class="hidden max-w-md mx-auto pb-10">
         <p id="dash-region-tag" class="text-center text-amber-500 font-black uppercase mb-8 text-lg tracking-widest"></p>
         <div class="grid gap-4"> 
@@ -80,28 +72,44 @@
                     <div class="flex justify-between items-center"><span class="font-bold text-sm uppercase">ALTO:</span><span id="pozo-alto-label" class="text-pozo">$0</span></div>
                 </div>
             </div>
+            
             <div id="cont-basico" class="premium-card p-6 flex flex-col items-center"> 
                 <button onclick="abrirNivel('Básico')" class="text-huge uppercase tracking-tighter">NIVEL BÁSICO</button>
                 <div id="btns-basico" class="flex gap-3 mt-4 hidden">
-                    <button onclick="confirmarModificar('Básico')" class="btn-modificar uppercase">MODIFICAR APUESTA</button>
-                    <button onclick="verEstadisticas('basico')" class="btn-stats uppercase">ESTADÍSTICAS</button>
+                    <button onclick="confirmarModificar('Básico')" class="btn-modificar uppercase">MODIFICAR</button>
+                    <button onclick="verEstadísticas('basico')" class="btn-stats uppercase">ESTADÍSTICAS</button>
                 </div>
             </div>
+            
             <div id="cont-medio" class="premium-card p-6 flex flex-col items-center">
                 <button onclick="abrirNivel('Medio')" class="text-huge uppercase tracking-tighter">NIVEL MEDIO</button>
                 <div id="btns-medio" class="flex gap-3 mt-4 hidden">
-                    <button onclick="confirmarModificar('Medio')" class="btn-modificar uppercase">MODIFICAR APUESTA</button>
-                    <button onclick="verEstadisticas('medio')" class="btn-stats uppercase">ESTADÍSTICAS</button>
+                    <button onclick="confirmarModificar('Medio')" class="btn-modificar uppercase">MODIFICAR</button>
+                    <button onclick="verEstadísticas('medio')" class="btn-stats uppercase">ESTADÍSTICAS</button>
                 </div>
             </div>
+            
             <div id="cont-alto" class="premium-card p-6 flex flex-col items-center">
                 <button onclick="abrirNivel('Alto')" class="text-huge uppercase tracking-tighter">NIVEL ALTO</button>
                 <div id="btns-alto" class="flex gap-3 mt-4 hidden">
-                    <button onclick="confirmarModificar('Alto')" class="btn-modificar uppercase">MODIFICAR APUESTA</button>
-                    <button onclick="verEstadisticas('alto')" class="btn-stats uppercase">ESTADÍSTICAS</button>
+                    <button onclick="confirmarModificar('Alto')" class="btn-modificar uppercase">MODIFICAR</button>
+                    <button onclick="verEstadísticas('alto')" class="btn-stats uppercase">ESTADÍSTICAS</button>
                 </div>
             </div>
+
+            <!-- BOTÓN RESULTADOS REGIÓN -->
+            <div class="pt-4">
+                <button onclick="abrirResultadosRegión()" id="btn-region-results" class="premium-card w-full p-5 font-black uppercase text-[12px] text-center transition-all">
+                    VER RESULTADOS DE ESTA REGIÓN
+                </button>
+            </div>
         </div>
+    </div>
+
+    <!-- VISTA GANADORES -->
+    <div id="view-resultados" class="hidden max-w-md mx-auto pb-10">
+        <h2 class="text-2xl font-black mb-8 text-center uppercase tracking-tighter text-amber-500">GANADORES OFICIALES</h2>
+        <div id="resultados-lista" class="space-y-6"></div>
     </div>
 
     <!-- PÓDIUM -->
@@ -115,7 +123,7 @@
         <div id="band-container" class="grid grid-cols-2 gap-3 max-h-[40vh] overflow-y-auto pb-24"></div>
         <div class="fixed bottom-0 left-0 w-full p-5 bg-slate-900/95 flex gap-4 backdrop-blur-md">
             <button onclick="cancelarPodium()" class="flex-1 border border-slate-700 py-5 rounded-2xl text-[12px] font-black uppercase">CANCELAR</button>
-            <button onclick="prepararConfirmacion()" class="flex-[2] btn-gold py-5 rounded-2xl text-[12px] font-black uppercase shadow-lg">CONFIRMAR</button>
+            <button onclick="prepararConfirmación()" class="flex-[2] btn-gold py-5 rounded-2xl text-[12px] font-black uppercase shadow-lg">CONFIRMAR</button>
         </div>
     </div>
 
@@ -132,14 +140,14 @@
     </div>
 
     <script>
-        const API = 'https://script.google.com/macros/s/AKfycbzpFo0NVMLB3vEiJR7DLTNWgHnreraDlTd9WRuZI63TlJrlG-aBDqVrLSSBgT9hfe5u/exec';
+        const API = 'https://script.google.com/macros/s/AKfycbwlirIwKUL8oRuPNDyaRhgy371NQTyY9tWIcCs4a0gJEUNY3mNeURQQC4JTLaoQvWk/exec';
         
         const LIMITES_NIVEL = { 'basico': 2, 'medio': 2, 'alto': 3 };
 
         let user = localStorage.getItem('podium_user');
         let app = { region: '', nivel: '', p1: '', p2: '', p3: '', ediciones: 0, existe: false };
         let cacheData = {};
-        let configGlobal = { config: {}, resultadosActivos: false, regiones: [], ganadoresOficiales: [] };
+        let configGlobal = { config: {}, regiones: [], ganadoresOficiales: [] };
 
         if (user) initApp();
 
@@ -156,7 +164,6 @@
             try {
                 const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getInitData' }) });
                 configGlobal = await r.json();
-                actualizarBotonResultados();
             } catch(e) { console.error("Error initData:", e); }
             toggleLoader(false);
 
@@ -164,23 +171,12 @@
             const savedNivel = localStorage.getItem('podium_nivel');
             if (savedRegion) {
                 app.region = savedRegion;
-                await cargarDatosRegion(savedRegion, false);
+                await cargarDatosRegión(savedRegion, false);
                 if (savedNivel) abrirNivel(savedNivel);
                 else showView('view-dashboard');
             } else {
                 showView('view-region');
                 renderRegiones();
-            }
-        }
-
-        function actualizarBotonResultados() {
-            const btn = document.getElementById('btn-main-results');
-            if (configGlobal.resultadosActivos) {
-                btn.className = 'premium-card w-full p-6 font-black uppercase text-lg text-center btn-results-active';
-                btn.innerHTML = 'VER RESULTADOS';
-            } else {
-                btn.className = 'premium-card w-full p-6 font-black uppercase text-lg text-center btn-results-locked';
-                btn.innerHTML = 'RESULTADOS <span class="block text-[8px] mt-1 opacity-50">PRÓXIMAMENTE DISPONIBLES</span>';
             }
         }
 
@@ -205,52 +201,26 @@
                         return;
                     }
                     localStorage.setItem('podium_region', r);
-                    cargarDatosRegion(r);
+                    cargarDatosRegión(r);
                 };
                 c.appendChild(b);
             });
         }
 
-        function renderResultados() {
-            const lista = document.getElementById('resultados-lista');
-            lista.innerHTML = '';
-            
-            const ganadoresVisibles = configGlobal.ganadoresOficiales.filter(g => {
-                const status = configGlobal.regiones.find(r => r.nombre.toUpperCase() === g.region.toUpperCase());
-                return status && status.mostrarResultados;
-            });
-
-            if (ganadoresVisibles.length === 0) {
-                lista.innerHTML = '<div class="premium-card p-10 text-center"><p class="text-slate-400 font-bold uppercase text-[10px]">NO HAY GANADORES PUBLICADOS AÚN.</p></div>';
-                return;
-            }
-
-            const regionesUnicas = [...new Set(ganadoresVisibles.map(g => g.region))];
-            regionesUnicas.forEach(reg => {
-                const container = document.createElement('div');
-                container.className = 'premium-card p-6 border-amber-500/20 mb-4';
-                let html = `<h4 class="text-amber-500 font-black uppercase text-sm mb-4 tracking-widest text-center border-b border-slate-800 pb-2">${reg}</h4>`;
-                const ganadoresReg = ganadoresVisibles.filter(g => g.region === reg);
-                ganadoresReg.forEach(gan => {
-                    html += `
-                        <div class="mb-6 last:mb-0">
-                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2">NIVEL ${gan.nivel}</p>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center text-[11px] font-bold uppercase"><span class="text-slate-500">1°</span> <span>${gan.p1}</span></div>
-                                <div class="flex justify-between items-center text-[11px] font-bold uppercase"><span class="text-slate-500">2°</span> <span>${gan.p2}</span></div>
-                                ${gan.p3 ? `<div class="flex justify-between items-center text-[11px] font-bold uppercase"><span class="text-slate-500">3°</span> <span>${gan.p3}</span></div>` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-                lista.appendChild(container);
-            });
-        }
-
-        async function cargarDatosRegion(region, changeView = true) {
+        async function cargarDatosRegión(region, changeView = true) {
             app.region = region;
             document.getElementById('dash-region-tag').innerText = region;
+            
+            const statusObj = configGlobal.regiones.find(reg => reg.nombre.toUpperCase() === region.toUpperCase());
+            const btnResults = document.getElementById('btn-region-results');
+            if (statusObj && statusObj.mostrarResultados) {
+                btnResults.className = 'premium-card w-full p-5 font-black uppercase text-[12px] text-center btn-results-active transition-all';
+                btnResults.innerHTML = 'VER RESULTADOS DE ESTA REGIÓN';
+            } else {
+                btnResults.className = 'premium-card w-full p-5 font-black uppercase text-[12px] text-center btn-results-locked transition-all';
+                btnResults.innerHTML = 'RESULTADOS PRÓXIMAMENTE';
+            }
+
             if(changeView) showView('view-dashboard');
             toggleLoader(true, "CARGANDO DATOS...");
             const niveles = ['basico', 'medio', 'alto'];
@@ -267,18 +237,44 @@
             toggleLoader(false);
         }
 
-        function abrirResultados() {
-            if(!configGlobal.resultadosActivos) {
+        function abrirResultadosRegión() {
+            const statusObj = configGlobal.regiones.find(reg => reg.nombre.toUpperCase() === app.region.toUpperCase());
+            if (!statusObj || !statusObj.mostrarResultados) {
                 document.getElementById('modal-title').innerText = "PRÓXIMAMENTE";
-                document.getElementById('modal-text').innerText = "Los resultados se publicarán al finalizar el concurso de cada región.";
+                document.getElementById('modal-text').innerText = "Los resultados de esta región se publicarán al finalizar el concurso.";
                 document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
                 document.getElementById('btn-modal-ok').onclick = closeModal;
                 document.getElementById('btn-modal-cancel').classList.add('hidden');
                 document.getElementById('modal-confirm').classList.remove('hidden');
-            } else {
-                renderResultados();
-                showView('view-resultados');
+                return;
             }
+
+            const lista = document.getElementById('resultados-lista');
+            lista.innerHTML = '';
+            const ganadoresReg = configGlobal.ganadoresOficiales.filter(g => g.region.toUpperCase() === app.region.toUpperCase());
+
+            if (ganadoresReg.length === 0) {
+                lista.innerHTML = '<div class="premium-card p-10 text-center"><p class="text-slate-400 font-bold uppercase text-[10px]">NO HAY GANADORES REGISTRADOS AÚN.</p></div>';
+            } else {
+                const container = document.createElement('div');
+                container.className = 'premium-card p-6 border-amber-500/20 mb-4';
+                let html = `<h4 class="text-amber-500 font-black uppercase text-sm mb-6 tracking-widest text-center border-b border-slate-800 pb-2">${app.region}</h4>`;
+                ganadoresReg.forEach(gan => {
+                    html += `
+                        <div class="mb-6 last:mb-0">
+                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2">NIVEL ${gan.nivel}</p>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center text-[11px] font-bold uppercase"><span class="text-slate-500">1°</span> <span>${gan.p1}</span></div>
+                                <div class="flex justify-between items-center text-[11px] font-bold uppercase"><span class="text-slate-500">2°</span> <span>${gan.p2}</span></div>
+                                ${gan.p3 ? `<div class="flex justify-between items-center text-[11px] font-bold uppercase"><span class="text-slate-500">3°</span> <span>${gan.p3}</span></div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                lista.appendChild(container);
+            }
+            showView('view-resultados');
         }
 
         function showView(id) {
@@ -291,7 +287,7 @@
                 document.getElementById('btn-atras').onclick = () => {
                     if(id === 'view-dashboard') { localStorage.removeItem('podium_region'); showView('view-region'); } 
                     else if(id === 'view-podium') { cancelarPodium(); }
-                    else if(id === 'view-resultados') { showView('view-region'); }
+                    else if(id === 'view-resultados') { showView('view-dashboard'); }
                 };
             }
         }
@@ -365,7 +361,7 @@
             
             if (edicionesActuales >= limiteEdiciones) {
                 document.getElementById('modal-title').innerText = "SIN INTENTOS";
-                document.getElementById('modal-text').innerText = "Ya has utilizado tus oportunidades de modificación.\n\nNo se permiten más cambios a esta apuesta.";
+                document.getElementById('modal-text').innerText = "Ya has utilizado tus oportunidades de modificación.\n\nNo se permiten más cambios.";
                 document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
                 document.getElementById('btn-modal-ok').onclick = closeModal;
                 document.getElementById('btn-modal-cancel').classList.add('hidden');
@@ -375,7 +371,7 @@
             
             const costo = (configGlobal.config.costoEdicion || 1000).toLocaleString();
             document.getElementById('modal-title').innerText = "ATENCIÓN";
-            document.getElementById('modal-text').innerText = `Vas a editar tu apuesta.\n\nEsta es la modificación #${edicionesActuales + 1}.\nCosto: $${costo} que se descontará del pozo.`;
+            document.getElementById('modal-text').innerText = `Vas a editar tu apuesta.\n\nIntento #${edicionesActuales + 1}.\nCosto: $${costo} que se descontará del pozo.`;
             document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
             document.getElementById('btn-modal-ok').onclick = () => { closeModal(); abrirNivel(nivelLabel); };
             document.getElementById('btn-modal-cancel').classList.remove('hidden');
@@ -385,13 +381,13 @@
         function removeBand(s) { app['p'+s] = ''; syncUI(); }
         function cancelarPodium() { localStorage.removeItem('podium_nivel'); showView('view-dashboard'); }
 
-        function prepararConfirmacion() {
+        function prepararConfirmación() {
             const nNorm = app.nivel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             const limite = LIMITES_NIVEL[nNorm] || 3;
             const picks = [app.p1, app.p2, app.p3].filter(p => p !== '');
-            if(picks.length < limite) return alert(`COMPLETA LAS ${limite} POSICIONES DEL PÓDIUM`);
+            if(picks.length < limite) return alert(`COMPLETA LAS ${limite} POSICIONES`);
             const uniquePicks = new Set(picks);
-            if(uniquePicks.size !== limite) return alert('UNA BANDA NO PUEDE ESTAR EN DOS POSICIONES');
+            if(uniquePicks.size !== limite) return alert('BANDA REPETIDA EN EL PÓDIUM');
             
             const costoE = (configGlobal.config.costoEntrada || 20000).toLocaleString();
             const costoEd = (configGlobal.config.costoEdicion || 1000).toLocaleString();
@@ -412,7 +408,7 @@
                 await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'saveApuesta', user, region: app.region, categoria: nNorm, p1: app.p1, p2: app.p2, p3: app.p3 }) });
                 alert('¡ÉXITO!');
                 localStorage.removeItem('podium_nivel');
-                await cargarDatosRegion(app.region); 
+                await cargarDatosRegión(app.region); 
             } catch(e) { alert('ERROR'); }
             toggleLoader(false);
         }
@@ -441,7 +437,7 @@
             toggleLoader(false);
         }
 
-        async function verEstadisticas(n) {
+        async function verEstadísticas(n) {
             toggleLoader(true, "OBTENIENDO STATS...");
             try {
                 const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getStats', region: app.region, nivel: n }) });
