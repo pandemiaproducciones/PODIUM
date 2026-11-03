@@ -68,7 +68,7 @@
 
   /* ====== LOGIN ====== */
   .hero { text-align: center; padding: 48px 0 30px; }
-  .hero-title { font-size: clamp(56px, 18vw, 84px); margin: 14px 0 16px; }
+  .hero-title { font-size: clamp(42px, 13.5vw, 76px); margin: 14px 0 16px; }
   .hero-title span { display: block; color: var(--amber); text-shadow: 0 0 40px rgba(255,178,63,.35); }
   .hero-sub { color: var(--muted); font-size: 15px; line-height: 1.5; max-width: 320px; margin: 0 auto; }
   .lights { display: flex; justify-content: center; gap: 6px; margin-top: 22px; }
@@ -310,7 +310,7 @@
    1) DIRECCIÓN DEL "CEREBRO" (Apps Script)
    Si al publicar Apps Script te da una dirección nueva, pégala aquí.
    ===================================================================== */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxzlHfQnoFOVYxvDOXgnws5E8oYwh1SIp8ghM9ZRNWB6TQrmuNFgRIa5xc4cPfuD9Xm/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycby0fZWQsAKWn3LwW2wbXUNnn854YCMZ01mrZElFlSnO2sIWWRKm4GBemcczotQay7IG6w/exec';
 
 // Si abres la página con ?demo al final (ej: tusitio.github.io/?demo) funciona
 // con datos de mentira, sin tocar tu hoja. Usuario: demo · Contraseña: demo
@@ -356,7 +356,7 @@ async function cargar() {
 }
 
 function mensajeError(e) {
-  return (e && e.message && !/fetch|network|json/i.test(e.message)) ? e.message : 'No hay conexión con el servidor. Intenta de nuevo.';
+  return (e && e.message && !/fetch|network|json|load failed/i.test(e.message)) ? e.message : 'No hay conexión con el servidor. Intenta de nuevo.';
 }
 
 /* =====================================================================
