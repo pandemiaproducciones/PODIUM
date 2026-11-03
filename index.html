@@ -384,7 +384,7 @@ function salir() {
    ===================================================================== */
 function pintarInicio() {
   const d = datos, c = d.config, mia = d.miApuesta;
-  if (c.puestosPremiados == null) c.puestosPremiados = 6;  // por si el cerebro aún no envía estos datos
+  if (c.puestosPremiados == null) c.puestosPremiados = 5;  // por si el cerebro aún no envía estos datos
   if (c.comision == null) c.comision = 0.1;
   $('txt-nombre').textContent = d.usuario.nombre;
   $('txt-pozo').textContent = pesos(d.pozo);
