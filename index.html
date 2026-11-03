@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0c0a0f">
 <title>Pódium · Final Departamental</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,6 +40,8 @@
       var(--bg);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
+    touch-action: manipulation; /* evita el zoom con doble toque */
+    -webkit-text-size-adjust: 100%;
   }
   .wrap { max-width: 480px; margin: 0 auto; padding: 16px 16px 140px; }
   .hidden { display: none !important; }
@@ -121,6 +123,14 @@
   .board li { display: flex; justify-content: space-between; padding: 11px 2px; border-bottom: 1px solid var(--line); font-size: 14px; }
   .board li:last-child { border-bottom: 0; }
   .board li.me { color: var(--amber); font-weight: 700; }
+  .board li.win span:first-child::before { content: '★ '; color: var(--gold); }
+
+  .ganadores { margin-top: 16px; text-align: center; padding: 26px 20px; border-color: rgba(255,207,92,.45);
+               background: radial-gradient(ellipse 90% 70% at 50% 0%, rgba(255,207,92,.20), transparent 70%), var(--panel); }
+  .ganadores .trofeo { font-size: 40px; line-height: 1; }
+  .ganadores .nombres { font-size: clamp(30px, 9vw, 40px); color: var(--gold); margin: 12px 0 10px; }
+  .ganadores .premio { font-size: 15px; color: var(--text); font-weight: 700; }
+  .ganadores .detalle { font-size: 13px; color: var(--muted); margin-top: 6px; }
 
   /* ====== EDITOR DE RANKING ====== */
   .editor-head { margin-bottom: 18px; }
@@ -130,6 +140,7 @@
   .slot { display: flex; align-items: center; gap: 12px; padding: 7px 8px 7px 12px; min-height: 52px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); transition: border-color .2s, background .2s; }
   .slot.empty { border-style: dashed; background: transparent; }
   .slot.next { border-color: var(--amber); border-style: dashed; background: rgba(255,178,63,.05); }
+  .corte { list-style: none; text-align: center; font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--amber); padding: 6px 0 10px; border-bottom: 1px dashed rgba(255,178,63,.4); margin-bottom: 6px; }
   .slot .pos { font-family: 'Anton', Impact, sans-serif; font-size: 24px; width: 32px; text-align: center; color: var(--dim); flex: none; }
   .slot:nth-child(1) .pos { color: var(--gold); } .slot:nth-child(2) .pos { color: var(--silver); } .slot:nth-child(3) .pos { color: var(--bronze); }
   .slot .name { flex: 1; font-weight: 700; font-size: 15px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -209,6 +220,7 @@
         <span class="pill"><span id="txt-apostadores">0</span>&nbsp;apostadores</span>
         <span class="pill" id="pill-estado"><span class="dot"></span><span id="txt-estado">Apuestas abiertas</span></span>
       </div>
+      <p class="note" id="txt-premio-pozo" style="margin-top:14px"></p>
     </div>
 
     <div class="ticket">
@@ -233,6 +245,13 @@
     </div>
 
     <div id="box-resultados" class="hidden">
+      <div class="card ganadores">
+        <div class="trofeo">🏆</div>
+        <p class="eyebrow" id="txt-ganadores-titulo" style="margin-top:10px">Ganador</p>
+        <div class="display nombres" id="txt-ganadores"></div>
+        <p class="premio" id="txt-premio"></p>
+        <p class="detalle" id="txt-premio-detalle"></p>
+      </div>
       <h2 class="display section-title">Resultados <span style="color:var(--amber)">oficiales</span></h2>
       <div class="card">
         <p class="note" style="margin:0 0 14px" id="txt-aciertos"></p>
@@ -255,7 +274,7 @@
     <div class="editor-head">
       <p class="eyebrow" id="txt-editor-eyebrow">Nueva apuesta</p>
       <h2 class="display">Tu ranking</h2>
-      <p>Toca las bandas en el orden en que crees que van a quedar. Usa ↑ ↓ para moverlas y ✕ para quitarlas.</p>
+      <p>Toca las bandas en el orden en que crees que van a quedar. Usa ↑ ↓ para moverlas y ✕ para quitarlas. <b style="color:var(--amber)" id="txt-editor-premio"></b></p>
     </div>
     <div class="pool-title" style="margin-top:0">
       <span class="eyebrow">Por ubicar</span>
@@ -365,11 +384,15 @@ function salir() {
    ===================================================================== */
 function pintarInicio() {
   const d = datos, c = d.config, mia = d.miApuesta;
+  if (c.puestosPremiados == null) c.puestosPremiados = 6;  // por si el cerebro aún no envía estos datos
+  if (c.comision == null) c.comision = 0.1;
   $('txt-nombre').textContent = d.usuario.nombre;
   $('txt-pozo').textContent = pesos(d.pozo);
   $('txt-apostadores').textContent = d.apostadores;
   $('txt-estado').textContent = c.abierta ? 'Apuestas abiertas' : 'Apuestas cerradas';
   $('pill-estado').classList.toggle('closed', !c.abierta);
+  $('txt-premio-pozo').innerHTML = 'Premio para quien acierte los ' + c.puestosPremiados + ' primeros: <b style="color:var(--text)">' +
+    pesos(d.pozo - Math.round(d.pozo * c.comision)) + '</b> (' + Math.round((1 - c.comision) * 100) + ' % del pozo)';
 
   // Tiquete
   const oficial = d.resultados ? d.resultados.oficial : [];
@@ -406,16 +429,41 @@ function pintarInicio() {
   $('box-resultados').classList.toggle('hidden', !d.resultados);
   if (d.resultados) {
     pintarMini($('rank-oficial'), oficial, []);
-    const yo = d.resultados.tabla.find(t => t.esTuyo);
-    $('txt-aciertos').textContent = yo
-      ? 'Acertaste ' + yo.aciertos + ' de ' + oficial.length + ' posiciones exactas (en verde en tu tiquete).'
+    // REGLA: gana quien acierte exactamente los N primeros puestos (N = puestos_premiados en la hoja).
+    // Los ganadores se reparten en partes iguales el pozo menos la comisión de la app.
+    const N = c.puestosPremiados;
+    const tabla = d.resultados.tabla.map(t => {
+      const top = t.puestos.slice(0, N).filter(Boolean).length;
+      return Object.assign({}, t, { top, total: t.puestos.filter(Boolean).length, gana: top === N && oficial.length >= N });
+    }).sort((x, y) => (y.top - x.top) || (y.total - x.total));
+    const ganadores = tabla.filter(t => t.gana);
+    const comision = Math.round(d.pozo * c.comision);
+    const cadaUno = ganadores.length ? Math.floor((d.pozo - comision) / ganadores.length) : 0;
+
+    if (ganadores.length) {
+      $('txt-ganadores-titulo').textContent = ganadores.length > 1 ? ganadores.length + ' ganadores' : 'Ganador';
+      $('txt-ganadores').textContent = ganadores.map(g => g.nombre).join(' · ');
+      $('txt-premio').textContent = ganadores.length > 1 ? pesos(cadaUno) + ' para cada uno' : 'Gana ' + pesos(cadaUno);
+      $('txt-premio-detalle').textContent = 'Acertaron los ' + N + ' primeros puestos. Se reparte el ' + Math.round((1 - c.comision) * 100) +
+        ' % del pozo (' + pesos(d.pozo - comision) + '); la app se queda con ' + pesos(comision) + '.' +
+        (ganadores.some(g => g.esTuyo) ? ' ¡Felicitaciones!' : '');
+    } else {
+      $('txt-ganadores-titulo').textContent = 'Sin ganadores';
+      $('txt-ganadores').textContent = 'Nadie acertó';
+      $('txt-premio').textContent = 'Nadie acertó los ' + N + ' primeros puestos';
+      $('txt-premio-detalle').textContent = 'El pozo completo (' + pesos(d.pozo) + ') queda para la app.';
+    }
+    const yoT = tabla.find(t => t.esTuyo);
+    $('txt-aciertos').textContent = yoT
+      ? 'Acertaste ' + yoT.top + ' de los ' + N + ' primeros puestos (' + yoT.total + ' de ' + oficial.length + ' en total, en verde en tu tiquete).'
       : 'No participaste en esta final.';
+
     $('tabla').innerHTML = '';
-    d.resultados.tabla.forEach((t, i) => {
+    tabla.forEach((t, i) => {
       const li = document.createElement('li');
-      if (t.esTuyo) li.className = 'me';
+      li.className = (t.esTuyo ? 'me' : '') + (t.gana ? ' win' : '');
       const a = document.createElement('span'); a.textContent = (i + 1) + '. ' + t.nombre;
-      const b = document.createElement('span'); b.textContent = t.aciertos + ' aciertos';
+      const b = document.createElement('span'); b.textContent = t.top + ' de ' + N + (t.gana ? ' · ' + pesos(cadaUno) : '');
       li.append(a, b); $('tabla').appendChild(li);
     });
   }
@@ -425,7 +473,10 @@ function pintarInicio() {
     ['Ordena las <b>' + d.bandas.length + ' bandas</b>', ' del puesto 1 al ' + d.bandas.length + '.'],
     ['Tu apuesta vale <b>' + pesos(c.apuestaInicial) + '</b>', ' y suma al pozo.'],
     ['Puedes modificarla <b>' + c.maxModificaciones + ' veces</b>', '. Cada cambio descuenta ' + pesos(c.costoModificacion) + ' de tu apuesta.'],
-    ['El pozo es la <b>suma de todas las apuestas</b>', ' vigentes.']
+    ['El pozo es la <b>suma de todas las apuestas</b>', ' vigentes.'],
+    ['Gana quien acierte <b>exactamente los ' + c.puestosPremiados + ' primeros puestos</b>', ', en orden.'],
+    ['Los ganadores se reparten <b>en partes iguales el ' + Math.round((1 - c.comision) * 100) + ' % del pozo</b>',
+     '; la app se queda con el ' + Math.round(c.comision * 100) + ' %. Si nadie acierta, la app se queda con todo el pozo.']
   ];
   $('reglas').innerHTML = reglas.map((r, i) => '<li><span class="n">' + (i + 1) + '</span><span>' + r[0] + r[1] + '</span></li>').join('');
 }
@@ -457,6 +508,7 @@ function abrirEditor() {
   $('txt-editor-eyebrow').textContent = mia
     ? 'Modificación ' + (mia.modificaciones + 1) + ' de ' + datos.config.maxModificaciones
     : 'Nueva apuesta · ' + pesos(datos.config.apuestaInicial);
+  $('txt-editor-premio').textContent = 'Para ganar cuentan los ' + datos.config.puestosPremiados + ' primeros puestos.';
   pintarEditor();
   mostrar('v-editor');
   window.scrollTo(0, 0);
@@ -486,6 +538,12 @@ function pintarEditor() {
       li.appendChild(ctrls);
     }
     lista.appendChild(li);
+    if (i === datos.config.puestosPremiados - 1 && i < total - 1) {
+      const sep = document.createElement('li');
+      sep.className = 'corte';
+      sep.textContent = '▲ Estos ' + (i + 1) + ' puestos definen al ganador';
+      lista.appendChild(sep);
+    }
   });
 
   const libres = datos.bandas.filter(b => !borrador.includes(b));
@@ -597,7 +655,7 @@ function cerrarModal() { $('modal').classList.add('hidden'); }
 const demo = {
   bandas: ['Sonora Cafetera', 'Brisas del Cauca', 'La Murga del Barrio', 'Tambores de Guadua', 'Los del Altiplano', 'Viento Andino',
            'Banda La Quebrada', 'Cumbia de Ladera', 'Orquesta Niebla', 'Son de Montaña', 'Raíces del Río', 'Colectivo Bambuco'],
-  config: { abierta: true, apuestaInicial: 20000, costoModificacion: 1000, maxModificaciones: 2 },
+  config: { abierta: true, apuestaInicial: 20000, costoModificacion: 1000, maxModificaciones: 2, puestosPremiados: 6, comision: 0.1 },
   otras: [20000, 19000, 20000, 18000, 20000, 20000, 19000],
   mia: null
 };
@@ -613,17 +671,35 @@ async function demoApi(p) {
       demo.mia.ranking = p.ranking.slice();
     }
   }
+  // Con ?demo=resultados se ve cómo queda la pantalla cuando se publican los ganadores
+  let resultados = null;
+  if (/demo=resultados/.test(location.search)) {
+    demo.config.abierta = false;
+    if (!demo.mia) demo.mia = { ranking: demo.bandas.slice(), modificaciones: 1, valor: 19000 };
+    const oficial = demo.bandas.slice();
+    [oficial[3], oficial[4]] = [oficial[4], oficial[3]];
+    const p = s => s.split('').map(x => x === '1');
+    resultados = { oficial, tabla: [
+      { nombre: 'Invitado Demo', puestos: p('111001111111'), esTuyo: true },
+      { nombre: 'Carolina', puestos: p('111111001000'), esTuyo: false },
+      { nombre: 'Andrés', puestos: p('111111000001'), esTuyo: false },
+      { nombre: 'Luisa', puestos: p('100100000000'), esTuyo: false }] };
+  }
   const valores = demo.otras.concat(demo.mia ? [demo.mia.valor] : []);
   return {
     ok: true, usuario: { nombre: 'Invitado Demo' }, config: demo.config, bandas: demo.bandas,
     miApuesta: demo.mia ? JSON.parse(JSON.stringify(demo.mia)) : null,
-    pozo: valores.reduce((a, b) => a + b, 0), apostadores: valores.length, resultados: null
+    pozo: valores.reduce((a, b) => a + b, 0), apostadores: valores.length, resultados
   };
 }
 
 /* =====================================================================
    10) ARRANQUE
    ===================================================================== */
+// Bloquear el zoom con dos dedos (Safari en iPhone ignora user-scalable=no)
+['gesturestart', 'gesturechange'].forEach(ev => document.addEventListener(ev, e => e.preventDefault(), { passive: false }));
+document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+
 if (DEMO) { const b = document.createElement('div'); b.className = 'demo-badge'; b.textContent = 'MODO DEMO'; document.body.appendChild(b); }
 if (sesion) cargar(); else mostrar('v-login');
 </script>
