@@ -28,7 +28,7 @@ const POR_DEFECTO = {
   costo_modificacion: 1000,
   max_modificaciones: 2,
   mostrar_resultados: 'NO',
-  puestos_premiados: 6,   // gana quien acierte exactamente estos primeros puestos
+  puestos_premiados: 5,   // gana quien acierte exactamente estos primeros puestos
   comision_app: 0.10      // parte del pozo que se queda la app si hay ganadores
 };
 
@@ -53,7 +53,7 @@ function prepararHoja() {
     ['costo_modificacion', 1000, 'Lo que se descuenta cada vez que alguien modifica.'],
     ['max_modificaciones', 2, 'Cuántas veces puede modificar cada persona.'],
     ['mostrar_resultados', 'NO', 'Pon SI cuando ya llenaste final_resultados y quieres que todos lo vean.'],
-    ['puestos_premiados', 6, 'Gana quien acierte exactamente estos primeros puestos, en orden.'],
+    ['puestos_premiados', 5, 'Gana quien acierte exactamente estos primeros puestos, en orden.'],
     ['comision_app', 0.1, 'Parte del pozo que se queda la app cuando hay ganadores. Si nadie gana, la app se queda con todo.']
   ]);
 
@@ -223,7 +223,7 @@ function config_() {
   let comision = Number(String(cfg.comision_app).replace('%', '')) || 0;
   if (comision > 1) comision = comision / 100; // acepta 10 o 10% o 0.1
   return {
-    puestosPremiados: Number(cfg.puestos_premiados) || 6,
+    puestosPremiados: Number(cfg.puestos_premiados) || 5,
     comision: comision,
     abierta: clave_(cfg.estado) === 'abierta',
     apuestaInicial: Number(cfg.apuesta_inicial) || 0,
