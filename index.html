@@ -1,460 +1,631 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PÓDIUM PREMIUM v2.3</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Montserrat', sans-serif; background-color: #0b0f1a; color: #f8fafc; overflow-x: hidden; }
-        .premium-card { background: rgba(22, 28, 45, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 1.5rem; }
-        .btn-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #000; font-weight: 900; }
-        .btn-logout { background-color: #ef4444; color: white; border-radius: 0.5rem; padding: 0.3rem 0.6rem; font-size: 0.7rem; font-weight: 900; }
-        .podium-slot { border: 2px dashed #334155; border-radius: 1rem; min-height: 80px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; }
-        .slot-filled { border: 2px solid #fbbf24; background: rgba(251, 191, 36, 0.05); }
-        .hidden { display: none; }
-        .loader { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: #fbbf24; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .text-huge { font-size: 1.25rem; font-weight: 900; }
-        .text-pozo { font-size: 1.1rem; color: #fbbf24; font-weight: 900; }
-        .btn-modificar { background: #ef4444; color: white; font-size: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 900; }
-        .btn-stats { background: #3b82f6; color: white; font-size: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 900; }
-        .band-disabled { opacity: 0.2 !important; pointer-events: none !important; filter: grayscale(1); }
-        
-        /* BOTÓN RESULTADOS CONTEXTUAL */
-        .btn-results-locked { background: rgba(51, 65, 85, 0.3); color: rgba(148, 163, 184, 0.4); border: 1px solid rgba(255,255,255,0.02); cursor: not-allowed; }
-        .btn-results-active { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; font-weight: 900; box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2); }
-        
-        .region-closed { opacity: 0.5; position: relative; }
-        .region-closed::after { content: 'CERRADA'; position: absolute; top: 10px; right: 15px; font-size: 7px; background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 900; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0c0a0f">
+<title>Pódium · Final Departamental</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  /* ====== COLORES Y MEDIDAS (puedes cambiarlos aquí) ====== */
+  :root {
+    --bg: #0c0a0f;
+    --panel: #16121c;
+    --panel-2: #1f1928;
+    --line: rgba(255,255,255,.09);
+    --text: #f6f1e9;
+    --muted: #a59dae;
+    --dim: #6d6577;
+    --amber: #ffb23f;
+    --amber-d: #e2860f;
+    --rose: #ff4d6d;
+    --ok: #3ddc97;
+    --gold: #ffcf5c;
+    --silver: #d3d9e6;
+    --bronze: #dc9560;
+    --r: 18px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: var(--bg); color: var(--text); }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 80% 40% at 50% -8%, rgba(255,178,63,.20), transparent 70%),
+      radial-gradient(ellipse 45% 30% at 0% 0%, rgba(255,77,109,.14), transparent 70%),
+      radial-gradient(ellipse 45% 30% at 100% 0%, rgba(140,90,255,.10), transparent 70%),
+      var(--bg);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 16px 16px 140px; }
+  .hidden { display: none !important; }
+  .display { font-family: 'Anton', Impact, sans-serif; text-transform: uppercase; letter-spacing: .01em; line-height: .95; font-weight: 400; }
+  .eyebrow { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+
+  /* Botones */
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px 20px; border-radius: 14px; font-weight: 700; font-size: 15px; transition: transform .12s, opacity .2s; }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: linear-gradient(180deg, var(--amber), var(--amber-d)); color: #1d1406; box-shadow: 0 10px 28px -10px rgba(255,178,63,.7); }
+  .btn-ghost { border: 1px solid var(--line); background: rgba(255,255,255,.03); }
+  .btn[disabled] { opacity: .35; pointer-events: none; box-shadow: none; }
+  .btn small { font-weight: 500; opacity: .75; }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; }
+
+  /* Barra superior */
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .logo { font-family: 'Anton', Impact, sans-serif; font-size: 20px; letter-spacing: .04em; }
+  .logo span { color: var(--amber); }
+  .who { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+  .chip-btn { font-size: 12px; font-weight: 700; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); color: var(--text); }
+
+  /* ====== LOGIN ====== */
+  .hero { text-align: center; padding: 48px 0 30px; }
+  .hero-title { font-size: clamp(56px, 18vw, 84px); margin: 14px 0 16px; }
+  .hero-title span { display: block; color: var(--amber); text-shadow: 0 0 40px rgba(255,178,63,.35); }
+  .hero-sub { color: var(--muted); font-size: 15px; line-height: 1.5; max-width: 320px; margin: 0 auto; }
+  .lights { display: flex; justify-content: center; gap: 6px; margin-top: 22px; }
+  .lights i { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); opacity: .25; animation: blink 1.8s infinite; }
+  .lights i:nth-child(2n) { background: var(--rose); animation-delay: .3s; }
+  .lights i:nth-child(3n) { animation-delay: .6s; }
+  @keyframes blink { 50% { opacity: 1; } }
+  .field { display: block; margin-bottom: 14px; }
+  .field span { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; letter-spacing: .04em; }
+  .field input { width: 100%; padding: 15px 16px; border-radius: 12px; background: #0f0c14; border: 1px solid var(--line); color: var(--text); font: inherit; font-size: 16px; outline: none; }
+  .field input:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(255,178,63,.15); }
+
+  /* ====== INICIO ====== */
+  .pozo { position: relative; overflow: hidden; text-align: center; padding: 26px 20px 22px; border-color: rgba(255,178,63,.25);
+          background: linear-gradient(180deg, rgba(255,178,63,.10), rgba(255,178,63,0) 60%), var(--panel); }
+  .pozo-num { font-size: clamp(54px, 17vw, 76px); color: var(--amber); margin: 8px 0 6px; text-shadow: 0 0 36px rgba(255,178,63,.35); }
+  .pozo-meta { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .pill.closed .dot { background: var(--rose); box-shadow: 0 0 8px var(--rose); }
+
+  /* Tiquete (mi apuesta) */
+  .ticket { position: relative; margin-top: 16px; background: var(--panel-2); border-radius: var(--r); border: 1px solid var(--line); }
+  .ticket-top { padding: 20px; }
+  .ticket-cut { position: relative; height: 0; border-top: 2px dashed rgba(255,255,255,.12); margin: 0 18px; }
+  .ticket-cut::before, .ticket-cut::after { content: ''; position: absolute; top: -12px; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); }
+  .ticket-cut::before { left: -30px; } .ticket-cut::after { right: -30px; }
+  .ticket-bottom { padding: 18px 20px 20px; }
+  .ticket-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+  .ticket-value { font-size: 44px; }
+  .ticket-value.empty { color: var(--dim); }
+  .mods { display: flex; gap: 6px; margin-top: 8px; justify-content: flex-end; }
+  .mods i { width: 22px; height: 6px; border-radius: 3px; background: var(--amber); }
+  .mods i.used { background: rgba(255,255,255,.12); }
+  .mods-label { font-size: 12px; color: var(--muted); text-align: right; }
+  .note { font-size: 13px; color: var(--muted); line-height: 1.5; margin-top: 12px; }
+
+  .mini-rank { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; margin-bottom: 18px; }
+  .mini-rank li { display: flex; gap: 8px; align-items: baseline; font-size: 13px; min-width: 0; }
+  .mini-rank b { font-family: 'Anton', Impact, sans-serif; font-weight: 400; color: var(--dim); width: 20px; flex: none; text-align: right; }
+  .mini-rank li:nth-child(1) b { color: var(--gold); } .mini-rank li:nth-child(2) b { color: var(--silver); } .mini-rank li:nth-child(3) b { color: var(--bronze); }
+  .mini-rank span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mini-rank li.hit span { color: var(--ok); }
+
+  .section-title { margin: 30px 0 12px; font-size: 26px; }
+  .rules { list-style: none; display: grid; gap: 10px; }
+  .rules li { display: flex; gap: 12px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+  .rules li b { color: var(--text); font-weight: 700; }
+  .rules .n { flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; background: rgba(255,178,63,.12); color: var(--amber); font-family: 'Anton', Impact, sans-serif; font-size: 14px; }
+
+  .board { list-style: none; }
+  .board li { display: flex; justify-content: space-between; padding: 11px 2px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .board li:last-child { border-bottom: 0; }
+  .board li.me { color: var(--amber); font-weight: 700; }
+
+  /* ====== EDITOR DE RANKING ====== */
+  .editor-head { margin-bottom: 18px; }
+  .editor-head h2 { font-size: 40px; margin: 6px 0 8px; }
+  .editor-head p { color: var(--muted); font-size: 14px; line-height: 1.5; }
+  .slots { list-style: none; display: grid; gap: 8px; }
+  .slot { display: flex; align-items: center; gap: 12px; padding: 7px 8px 7px 12px; min-height: 52px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); transition: border-color .2s, background .2s; }
+  .slot.empty { border-style: dashed; background: transparent; }
+  .slot.next { border-color: var(--amber); border-style: dashed; background: rgba(255,178,63,.05); }
+  .slot .pos { font-family: 'Anton', Impact, sans-serif; font-size: 24px; width: 32px; text-align: center; color: var(--dim); flex: none; }
+  .slot:nth-child(1) .pos { color: var(--gold); } .slot:nth-child(2) .pos { color: var(--silver); } .slot:nth-child(3) .pos { color: var(--bronze); }
+  .slot .name { flex: 1; font-weight: 700; font-size: 15px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .slot.empty .name { color: var(--dim); font-weight: 500; }
+  .slot .ctrls { display: flex; gap: 4px; flex: none; }
+  .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: rgba(255,255,255,.05); font-size: 15px; color: var(--muted); }
+  .ic:active { background: rgba(255,255,255,.12); }
+  .ic[disabled] { opacity: .25; pointer-events: none; }
+  .ic.x { color: var(--rose); }
+
+  .pool-title { display: flex; justify-content: space-between; align-items: baseline; margin: 26px 0 12px; }
+  .pool { display: flex; flex-wrap: wrap; gap: 8px; }
+  .band { padding: 12px 16px; border-radius: 999px; background: var(--panel-2); border: 1px solid rgba(255,178,63,.25); font-weight: 700; font-size: 14px; transition: transform .12s; }
+  .band:active { transform: scale(.94); background: rgba(255,178,63,.15); }
+  .pool-empty { color: var(--ok); font-size: 14px; font-weight: 700; }
+
+  .bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 16px calc(14px + env(safe-area-inset-bottom)); background: rgba(12,10,15,.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line); z-index: 20; }
+  .bar-in { max-width: 480px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+  .progress { flex: none; width: 92px; }
+  .progress b { font-family: 'Anton', Impact, sans-serif; font-weight: 400; font-size: 22px; }
+  .progress small { color: var(--muted); font-size: 12px; }
+  .track { height: 4px; border-radius: 2px; background: rgba(255,255,255,.1); margin-top: 4px; overflow: hidden; }
+  .track i { display: block; height: 100%; background: var(--amber); width: 0; transition: width .25s; }
+
+  /* ====== VENTANAS Y AVISOS ====== */
+  .overlay { position: fixed; inset: 0; z-index: 50; background: rgba(5,4,8,.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; align-items: flex-end; justify-content: center; padding: 16px; }
+  @media (min-width: 560px) { .overlay { align-items: center; } }
+  .sheet { width: 100%; max-width: 420px; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 24px; animation: up .22s ease-out; }
+  @keyframes up { from { transform: translateY(20px); opacity: 0; } }
+  .sheet h3 { font-size: 30px; margin-bottom: 10px; }
+  .sheet p { color: var(--muted); font-size: 15px; line-height: 1.55; margin-bottom: 20px; white-space: pre-line; }
+  .sheet .math { display: grid; gap: 8px; background: #0f0c14; border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; font-size: 14px; }
+  .sheet .math div { display: flex; justify-content: space-between; }
+  .sheet .math .total { border-top: 1px solid var(--line); padding-top: 8px; font-weight: 700; color: var(--amber); }
+  .sheet .actions { display: grid; gap: 10px; }
+
+  .loader { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: rgba(5,4,8,.6); }
+  .spin { width: 44px; height: 44px; border-radius: 50%; border: 3px solid rgba(255,255,255,.12); border-top-color: var(--amber); animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast { position: fixed; left: 50%; top: 16px; transform: translateX(-50%); z-index: 70; max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 12px; background: var(--rose); color: #fff; font-weight: 700; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+  .toast.good { background: var(--ok); color: #06231a; }
+
+  .demo-badge { position: fixed; right: 10px; bottom: 10px; z-index: 80; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: var(--rose); color: #fff; }
+</style>
 </head>
-<body class="p-4">
+<body>
+<div class="wrap">
 
-    <div id="loading-overlay" class="hidden fixed inset-0 bg-black/80 z-[100] flex flex-col items-center justify-center">
-        <div class="loader mb-4"></div>
-        <p id="loader-text" class="text-[12px] font-black uppercase tracking-widest text-amber-500">PROCESANDO...</p>
+  <!-- ==================== PANTALLA: ENTRAR ==================== -->
+  <section id="v-login">
+    <div class="hero">
+      <p class="eyebrow">Pódium · 12 agrupaciones</p>
+      <h1 class="display hero-title">Final <span>Departamental</span></h1>
+      <p class="hero-sub">Arma tu ranking de las 12 bandas finalistas, del primer al último puesto.</p>
+      <div class="lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <form class="card" id="form-login" autocomplete="on">
+      <label class="field"><span>USUARIO</span><input id="in-user" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+      <label class="field"><span>CONTRASEÑA</span><input id="in-pass" type="password" autocomplete="current-password"></label>
+      <button class="btn btn-primary" type="submit" style="margin-top:8px">Entrar</button>
+    </form>
+    <p class="note" style="text-align:center">¿No tienes usuario? Pídeselo al administrador.</p>
+  </section>
+
+  <!-- ==================== PANTALLA: INICIO ==================== -->
+  <section id="v-inicio" class="hidden">
+    <div class="topbar">
+      <div class="logo">PÓDIUM <span>·</span></div>
+      <div class="who"><span id="txt-nombre"></span><button class="chip-btn" onclick="salir()">Salir</button></div>
     </div>
 
-    <header id="global-header" class="hidden flex justify-between items-start mb-8">
-        <div id="atras-container" class="w-16"><button id="btn-atras" class="text-[11px] font-black text-slate-500 uppercase tracking-widest pt-2">← ATRÁS</button></div>
-        <div class="text-center flex-1 text-amber-500 font-black tracking-tighter uppercase">PÓDIUM PREMIUM v2.3<p id="header-username" class="text-[10px] text-slate-400 font-bold"></p></div>
-        <div class="w-16 flex justify-end"><button onclick="logout()" class="btn-logout uppercase tracking-tighter">SALIR</button></div>
-    </header>
+    <div class="card pozo">
+      <p class="eyebrow">Pozo acumulado</p>
+      <div class="display pozo-num" id="txt-pozo">$0</div>
+      <div class="pozo-meta">
+        <span class="pill"><span id="txt-apostadores">0</span>&nbsp;apostadores</span>
+        <span class="pill" id="pill-estado"><span class="dot"></span><span id="txt-estado">Apuestas abiertas</span></span>
+      </div>
+    </div>
 
-    <!-- VISTA LOGIN -->
-    <div id="view-login" class="max-w-md mx-auto mt-20">
-        <h1 class="text-4xl font-black text-center mb-1 uppercase tracking-tighter">PÓDIUM <span class="text-amber-500">PREMIUM</span></h1>
-        <p class="text-center text-[10px] font-black text-slate-600 mb-10 tracking-[0.3em]">VERSIÓN 2.3</p>
-        <div class="premium-card p-10 shadow-2xl">
-            <input id="login-user" type="text" placeholder="USUARIO" class="w-full p-5 mb-5 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold uppercase outline-none focus:border-amber-500">
-            <input id="login-pass" type="password" placeholder="CONTRASEÑA" class="w-full p-5 mb-8 rounded-2xl bg-slate-900 border border-slate-800 text-lg font-bold outline-none focus:border-amber-500">
-            <button onclick="handleLogin()" class="w-full btn-gold py-5 rounded-2xl text-lg font-black uppercase shadow-lg active:scale-95 transition-transform">ENTRAR</button>
+    <div class="ticket">
+      <div class="ticket-top">
+        <div class="ticket-row">
+          <div>
+            <p class="eyebrow">Tu apuesta</p>
+            <div class="display ticket-value" id="txt-valor">—</div>
+          </div>
+          <div id="box-mods">
+            <div class="mods-label" id="txt-mods"></div>
+            <div class="mods" id="mods"></div>
+          </div>
         </div>
+      </div>
+      <div class="ticket-cut"></div>
+      <div class="ticket-bottom">
+        <ol class="mini-rank" id="mi-ranking"></ol>
+        <p class="note" id="txt-sin-apuesta" style="margin:0 0 16px">Aún no has apostado. Ordena las bandas y confirma tu tiquete.</p>
+        <button class="btn btn-primary" id="btn-apostar" onclick="abrirEditor()"></button>
+      </div>
     </div>
 
-    <!-- VISTA REGIONES -->
-    <div id="view-region" class="hidden max-w-md mx-auto">
-        <h2 class="text-3xl font-black mb-10 text-center uppercase tracking-tight">SELECCIONA REGIÓN</h2>
-        <div id="region-list" class="grid gap-4 mb-10"></div>
+    <div id="box-resultados" class="hidden">
+      <h2 class="display section-title">Resultados <span style="color:var(--amber)">oficiales</span></h2>
+      <div class="card">
+        <p class="note" style="margin:0 0 14px" id="txt-aciertos"></p>
+        <ol class="mini-rank" id="rank-oficial" style="margin:0"></ol>
+      </div>
+      <h2 class="display section-title">Tabla</h2>
+      <div class="card" style="padding:6px 18px"><ol class="board" id="tabla"></ol></div>
     </div>
 
-    <!-- VISTA DASHBOARD -->
-    <div id="view-dashboard" class="hidden max-w-md mx-auto pb-10">
-        <p id="dash-region-tag" class="text-center text-amber-500 font-black uppercase mb-8 text-lg tracking-widest"></p>
-        <div class="grid gap-4"> 
-            <div class="premium-card p-6 border-amber-500/30"> 
-                <p class="text-[11px] font-black text-slate-400 uppercase text-center mb-4 tracking-widest">POZO ESTIMADO</p>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center"><span class="font-bold text-sm uppercase">BÁSICO:</span><span id="pozo-basico-label" class="text-pozo">$0</span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-sm uppercase">MEDIO:</span><span id="pozo-medio-label" class="text-pozo">$0</span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-sm uppercase">ALTO:</span><span id="pozo-alto-label" class="text-pozo">$0</span></div>
-                </div>
-            </div>
-            
-            <div id="cont-basico" class="premium-card p-6 flex flex-col items-center"> 
-                <button onclick="abrirNivel('Básico')" class="text-huge uppercase tracking-tighter">NIVEL BÁSICO</button>
-                <div id="btns-basico" class="flex gap-3 mt-4 hidden">
-                    <button onclick="confirmarModificar('Básico')" class="btn-modificar uppercase">MODIFICAR</button>
-                    <button onclick="verEstadísticas('basico')" class="btn-stats uppercase">ESTADÍSTICAS</button>
-                </div>
-            </div>
-            
-            <div id="cont-medio" class="premium-card p-6 flex flex-col items-center">
-                <button onclick="abrirNivel('Medio')" class="text-huge uppercase tracking-tighter">NIVEL MEDIO</button>
-                <div id="btns-medio" class="flex gap-3 mt-4 hidden">
-                    <button onclick="confirmarModificar('Medio')" class="btn-modificar uppercase">MODIFICAR</button>
-                    <button onclick="verEstadísticas('medio')" class="btn-stats uppercase">ESTADÍSTICAS</button>
-                </div>
-            </div>
-            
-            <div id="cont-alto" class="premium-card p-6 flex flex-col items-center">
-                <button onclick="abrirNivel('Alto')" class="text-huge uppercase tracking-tighter">NIVEL ALTO</button>
-                <div id="btns-alto" class="flex gap-3 mt-4 hidden">
-                    <button onclick="confirmarModificar('Alto')" class="btn-modificar uppercase">MODIFICAR</button>
-                    <button onclick="verEstadísticas('alto')" class="btn-stats uppercase">ESTADÍSTICAS</button>
-                </div>
-            </div>
+    <h2 class="display section-title">Cómo funciona</h2>
+    <ul class="rules" id="reglas"></ul>
+  </section>
 
-            <!-- BOTÓN RESULTADOS REGIÓN -->
-            <div class="pt-4">
-                <button onclick="abrirResultadosRegión()" id="btn-region-results" class="premium-card w-full p-5 font-black uppercase text-[12px] text-center transition-all">
-                    VER RESULTADOS DE ESTA REGIÓN
-                </button>
-            </div>
-        </div>
+  <!-- ==================== PANTALLA: ARMAR RANKING ==================== -->
+  <section id="v-editor" class="hidden">
+    <div class="topbar">
+      <button class="chip-btn" onclick="cerrarEditor()">← Volver</button>
+      <button class="chip-btn" onclick="limpiar()">Limpiar</button>
     </div>
-
-    <!-- VISTA GANADORES -->
-    <div id="view-resultados" class="hidden max-w-md mx-auto pb-10">
-        <h2 class="text-2xl font-black mb-8 text-center uppercase tracking-tighter text-amber-500">GANADORES OFICIALES</h2>
-        <div id="resultados-lista" class="space-y-6"></div>
+    <div class="editor-head">
+      <p class="eyebrow" id="txt-editor-eyebrow">Nueva apuesta</p>
+      <h2 class="display">Tu ranking</h2>
+      <p>Toca las bandas en el orden en que crees que van a quedar. Usa ↑ ↓ para moverlas y ✕ para quitarlas.</p>
     </div>
-
-    <!-- PÓDIUM -->
-    <div id="view-podium" class="hidden max-w-md mx-auto">
-        <h2 id="podium-header" class="text-center text-2xl font-black uppercase text-amber-500 mb-8 tracking-tighter"></h2>
-        <div id="podium-grid" class="grid grid-cols-3 gap-4 mb-8">
-            <div onclick="removeBand(1)" id="slot-1" class="podium-slot flex-col p-2 text-center"><span class="text-[9px] font-black text-amber-500/50 block uppercase">1°</span><span id="txt-p1" class="text-[11px] font-black uppercase">VACÍO</span></div>
-            <div onclick="removeBand(2)" id="slot-2" class="podium-slot flex-col p-2 text-center"><span class="text-[9px] font-black text-slate-500 block uppercase">2°</span><span id="txt-p2" class="text-[11px] font-black uppercase">VACÍO</span></div>
-            <div onclick="removeBand(3)" id="slot-3" class="podium-slot flex-col p-2 text-center"><span class="text-[9px] font-black text-slate-500 block uppercase">3°</span><span id="txt-p3" class="text-[11px] font-black uppercase">VACÍO</span></div>
-        </div>
-        <div id="band-container" class="grid grid-cols-2 gap-3 max-h-[40vh] overflow-y-auto pb-24"></div>
-        <div class="fixed bottom-0 left-0 w-full p-5 bg-slate-900/95 flex gap-4 backdrop-blur-md">
-            <button onclick="cancelarPodium()" class="flex-1 border border-slate-700 py-5 rounded-2xl text-[12px] font-black uppercase">CANCELAR</button>
-            <button onclick="prepararConfirmación()" class="flex-[2] btn-gold py-5 rounded-2xl text-[12px] font-black uppercase shadow-lg">CONFIRMAR</button>
-        </div>
+    <div class="pool-title" style="margin-top:0">
+      <span class="eyebrow">Por ubicar</span>
+      <span class="eyebrow" id="txt-faltan"></span>
     </div>
+    <div class="pool" id="pool"></div>
+    <div class="pool-title"><span class="eyebrow">Tu orden</span></div>
+    <ol class="slots" id="slots"></ol>
 
-    <!-- MODAL -->
-    <div id="modal-confirm" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center p-6 z-[110]">
-        <div class="premium-card p-10 w-full max-w-sm text-center">
-            <h3 id="modal-title" class="font-black mb-6 uppercase text-xl text-white"></h3>
-            <p id="modal-text" class="text-[12px] text-slate-400 mb-10 uppercase font-bold whitespace-pre-line leading-relaxed"></p>
-            <div id="modal-footer" class="flex gap-5">
-                <button id="btn-modal-cancel" onclick="closeModal()" class="flex-1 text-[12px] font-black uppercase text-slate-500">NO</button>
-                <button id="btn-modal-ok" class="flex-1 btn-gold py-4 rounded-xl text-[12px] font-black uppercase"></button>
-            </div>
-        </div>
+    <div class="bar">
+      <div class="bar-in">
+        <div class="progress"><b id="txt-progreso">0</b> <small id="txt-total">/ 12</small><div class="track"><i id="track"></i></div></div>
+        <button class="btn btn-primary" id="btn-confirmar" onclick="pedirConfirmacion()" disabled>Confirmar</button>
+      </div>
     </div>
+  </section>
+</div>
 
-    <script>
-        const API = 'https://script.google.com/macros/s/AKfycbwlirIwKUL8oRuPNDyaRhgy371NQTyY9tWIcCs4a0gJEUNY3mNeURQQC4JTLaoQvWk/exec';
-        
-        const LIMITES_NIVEL = { 'basico': 2, 'medio': 2, 'alto': 3 };
+<!-- Ventana emergente -->
+<div class="overlay hidden" id="modal" onclick="if(event.target===this) cerrarModal()">
+  <div class="sheet">
+    <h3 class="display" id="modal-titulo"></h3>
+    <p id="modal-texto"></p>
+    <div class="math hidden" id="modal-cuentas"></div>
+    <div class="actions" id="modal-acciones"></div>
+  </div>
+</div>
+<div class="loader hidden" id="loader"><div class="spin"></div></div>
+<div class="toast hidden" id="toast"></div>
 
-        let user = localStorage.getItem('podium_user');
-        let app = { region: '', nivel: '', p1: '', p2: '', p3: '', ediciones: 0, existe: false };
-        let cacheData = {};
-        let configGlobal = { config: {}, regiones: [], ganadoresOficiales: [] };
+<script>
+/* =====================================================================
+   1) DIRECCIÓN DEL "CEREBRO" (Apps Script)
+   Si al publicar Apps Script te da una dirección nueva, pégala aquí.
+   ===================================================================== */
+const API_URL = 'https://script.google.com/macros/s/AKfycby0fZWQsAKWn3LwW2wbXUNnn854YCMZ01mrZElFlSnO2sIWWRKm4GBemcczotQay7IG6w/exec';
 
-        if (user) initApp();
+// Si abres la página con ?demo al final (ej: tusitio.github.io/?demo) funciona
+// con datos de mentira, sin tocar tu hoja. Usuario: demo · Contraseña: demo
+const DEMO = new URLSearchParams(location.search).has('demo');
 
-        function toggleLoader(s, text = "PROCESANDO...") { 
-            document.getElementById('loader-text').innerText = text;
-            document.getElementById('loading-overlay').classList.toggle('hidden', !s); 
-        }
+/* =====================================================================
+   2) ESTADO DE LA APP
+   ===================================================================== */
+let sesion = guardado('podium_final_sesion');   // { user, pass }
+let datos = null;                               // lo que responde el cerebro
+let borrador = [];                              // ranking que se está armando
 
-        async function initApp() {
-            document.getElementById('header-username').innerText = user;
-            document.getElementById('global-header').classList.remove('hidden');
-            
-            toggleLoader(true, "CARGANDO CONFIGURACIÓN...");
-            try {
-                const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getInitData' }) });
-                configGlobal = await r.json();
-            } catch(e) { console.error("Error initData:", e); }
-            toggleLoader(false);
+const $ = id => document.getElementById(id);
+const pesos = n => '$' + Number(n || 0).toLocaleString('es-CO');
 
-            const savedRegion = localStorage.getItem('podium_region');
-            const savedNivel = localStorage.getItem('podium_nivel');
-            if (savedRegion) {
-                app.region = savedRegion;
-                await cargarDatosRegión(savedRegion, false);
-                if (savedNivel) abrirNivel(savedNivel);
-                else showView('view-dashboard');
-            } else {
-                showView('view-region');
-                renderRegiones();
-            }
-        }
+function guardado(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+function guardar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function borrar(k) { try { localStorage.removeItem(k); } catch (e) {} }
 
-        function renderRegiones() {
-            const rs = ['NORTE', 'ORIENTE', 'CENTRO-SUR', 'OCCIDENTE PRÓSPERO', 'MAGDALENA CALDENSE', 'ALTO OCCIDENTE'];
-            const c = document.getElementById('region-list'); c.innerHTML = '';
-            rs.forEach(r => {
-                const statusObj = configGlobal.regiones.find(reg => reg.nombre.toUpperCase() === r.toUpperCase());
-                const isClosed = statusObj && statusObj.estado === 'CERRADA';
-                
-                const b = document.createElement('button');
-                b.className = `premium-card p-6 font-black uppercase text-lg text-center active:scale-95 transition-transform ${isClosed ? 'region-closed' : ''}`;
-                b.innerText = r; 
-                b.onclick = () => {
-                    if(isClosed) {
-                        document.getElementById('modal-title').innerText = "REGIÓN CERRADA";
-                        document.getElementById('modal-text').innerText = "Las apuestas para esta región han finalizado.\nNo se permiten nuevos registros ni ediciones.";
-                        document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
-                        document.getElementById('btn-modal-ok').onclick = closeModal;
-                        document.getElementById('btn-modal-cancel').classList.add('hidden');
-                        document.getElementById('modal-confirm').classList.remove('hidden');
-                        return;
-                    }
-                    localStorage.setItem('podium_region', r);
-                    cargarDatosRegión(r);
-                };
-                c.appendChild(b);
-            });
-        }
+/* =====================================================================
+   3) HABLAR CON EL CEREBRO
+   ===================================================================== */
+async function llamar(accion, extra = {}) {
+  const pedido = Object.assign({ accion, user: sesion && sesion.user, pass: sesion && sesion.pass }, extra);
+  const r = DEMO
+    ? await demoApi(pedido)
+    : await fetch(API_URL, { method: 'POST', body: JSON.stringify(pedido) }).then(res => res.json());
+  if (!r.ok) throw new Error(r.error || 'Algo salió mal.');
+  return r;
+}
 
-        async function cargarDatosRegión(region, changeView = true) {
-            app.region = region;
-            document.getElementById('dash-region-tag').innerText = region;
-            
-            const statusObj = configGlobal.regiones.find(reg => reg.nombre.toUpperCase() === region.toUpperCase());
-            const btnResults = document.getElementById('btn-region-results');
-            if (statusObj && statusObj.mostrarResultados) {
-                btnResults.className = 'premium-card w-full p-5 font-black uppercase text-[12px] text-center btn-results-active transition-all';
-                btnResults.innerHTML = 'VER RESULTADOS DE ESTA REGIÓN';
-            } else {
-                btnResults.className = 'premium-card w-full p-5 font-black uppercase text-[12px] text-center btn-results-locked transition-all';
-                btnResults.innerHTML = 'RESULTADOS PRÓXIMAMENTE';
-            }
+async function cargar() {
+  cargando(true);
+  try {
+    datos = await llamar('datos');
+    pintarInicio();
+    mostrar('v-inicio');
+  } catch (e) {
+    aviso(mensajeError(e));
+    if (!datos) { borrar('podium_final_sesion'); sesion = null; mostrar('v-login'); }
+  }
+  cargando(false);
+}
 
-            if(changeView) showView('view-dashboard');
-            toggleLoader(true, "CARGANDO DATOS...");
-            const niveles = ['basico', 'medio', 'alto'];
-            try {
-                const promesas = niveles.map(n => fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData', user, region, nivel: n }) }).then(r => r.json()));
-                const resultados = await Promise.all(promesas);
-                niveles.forEach((n, i) => {
-                    const d = resultados[i]; cacheData[n] = d;
-                    document.getElementById(`pozo-${n}-label`).innerText = `$${(d.config?.pozo || 0).toLocaleString()}`;
-                    const btnBox = document.getElementById(`btns-${n}`);
-                    if(d.miApuesta) btnBox.classList.remove('hidden'); else btnBox.classList.add('hidden');
-                });
-            } catch(e) { console.error(e); }
-            toggleLoader(false);
-        }
+function mensajeError(e) {
+  return (e && e.message && !/fetch|network|json/i.test(e.message)) ? e.message : 'No hay conexión con el servidor. Intenta de nuevo.';
+}
 
-        function abrirResultadosRegión() {
-            const statusObj = configGlobal.regiones.find(reg => reg.nombre.toUpperCase() === app.region.toUpperCase());
-            if (!statusObj || !statusObj.mostrarResultados) {
-                document.getElementById('modal-title').innerText = "PRÓXIMAMENTE";
-                document.getElementById('modal-text').innerText = "Los resultados de esta región se publicarán al finalizar el concurso.";
-                document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
-                document.getElementById('btn-modal-ok').onclick = closeModal;
-                document.getElementById('btn-modal-cancel').classList.add('hidden');
-                document.getElementById('modal-confirm').classList.remove('hidden');
-                return;
-            }
+/* =====================================================================
+   4) ENTRAR / SALIR
+   ===================================================================== */
+$('form-login').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const user = $('in-user').value.trim();
+  const pass = $('in-pass').value.trim();
+  if (!user || !pass) return aviso('Escribe tu usuario y contraseña.');
+  sesion = { user, pass };
+  await cargar();
+  if (datos) guardar('podium_final_sesion', sesion);
+});
 
-            const lista = document.getElementById('resultados-lista');
-            lista.innerHTML = '';
-            const ganadoresReg = configGlobal.ganadoresOficiales.filter(g => g.region.toUpperCase() === app.region.toUpperCase());
+function salir() {
+  borrar('podium_final_sesion');
+  sesion = null; datos = null;
+  $('in-pass').value = '';
+  mostrar('v-login');
+}
 
-            if (ganadoresReg.length === 0) {
-                lista.innerHTML = '<div class="premium-card p-10 text-center"><p class="text-slate-400 font-bold uppercase text-[10px]">NO HAY GANADORES REGISTRADOS AÚN.</p></div>';
-            } else {
-                const container = document.createElement('div');
-                container.className = 'premium-card p-6 border-amber-500/20 mb-4';
-                let html = `<h4 class="text-amber-500 font-black uppercase text-sm mb-6 tracking-widest text-center border-b border-slate-800 pb-2">${app.region}</h4>`;
-                ganadoresReg.forEach(gan => {
-                    html += `
-                        <div class="mb-6 last:mb-0">
-                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2">NIVEL ${gan.nivel}</p>
-                            <div class="space-y-2">
-                                <div class="flex justify-between items-center text-[11px] font-bold uppercase"><span class="text-slate-500">1°</span> <span>${gan.p1}</span></div>
-                                <div class="flex justify-between items-center text-[11px] font-bold uppercase"><span class="text-slate-500">2°</span> <span>${gan.p2}</span></div>
-                                ${gan.p3 ? `<div class="flex justify-between items-center text-[11px] font-bold uppercase"><span class="text-slate-500">3°</span> <span>${gan.p3}</span></div>` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-                lista.appendChild(container);
-            }
-            showView('view-resultados');
-        }
+/* =====================================================================
+   5) PANTALLA DE INICIO
+   ===================================================================== */
+function pintarInicio() {
+  const d = datos, c = d.config, mia = d.miApuesta;
+  $('txt-nombre').textContent = d.usuario.nombre;
+  $('txt-pozo').textContent = pesos(d.pozo);
+  $('txt-apostadores').textContent = d.apostadores;
+  $('txt-estado').textContent = c.abierta ? 'Apuestas abiertas' : 'Apuestas cerradas';
+  $('pill-estado').classList.toggle('closed', !c.abierta);
 
-        function showView(id) {
-            document.querySelectorAll('div[id^="view-"]').forEach(v => v.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            const cont = document.getElementById('atras-container');
-            if(id === 'view-region') cont.classList.add('invisible');
-            else {
-                cont.classList.remove('invisible');
-                document.getElementById('btn-atras').onclick = () => {
-                    if(id === 'view-dashboard') { localStorage.removeItem('podium_region'); showView('view-region'); } 
-                    else if(id === 'view-podium') { cancelarPodium(); }
-                    else if(id === 'view-resultados') { showView('view-dashboard'); }
-                };
-            }
-        }
+  // Tiquete
+  const oficial = d.resultados ? d.resultados.oficial : [];
+  $('txt-valor').textContent = mia ? pesos(mia.valor) : 'Sin apostar';
+  $('txt-valor').classList.toggle('empty', !mia);
+  $('txt-sin-apuesta').classList.toggle('hidden', !!mia);
+  $('box-mods').classList.toggle('hidden', !mia);
+  pintarMini($('mi-ranking'), mia ? mia.ranking : [], oficial);
 
-        function abrirNivel(nivelLabel) {
-            app.nivel = nivelLabel;
-            localStorage.setItem('podium_nivel', nivelLabel);
-            const nNorm = nivelLabel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const d = cacheData[nNorm];
-            app.p1 = app.p2 = app.p3 = '';
-            document.getElementById('podium-header').innerText = nivelLabel.toUpperCase();
-            if(d.miApuesta) {
-                app.p1 = d.miApuesta.p1; app.p2 = d.miApuesta.p2; app.p3 = d.miApuesta.p3;
-                app.ediciones = d.miApuesta.ediciones; app.existe = true;
-            } else { app.existe = false; app.ediciones = 0; }
-            renderBandas(d.bandas, nNorm);
-            syncUI();
-            showView('view-podium');
-        }
+  const btn = $('btn-apostar');
+  btn.disabled = false;
+  if (!c.abierta) {
+    btn.disabled = true; btn.textContent = 'Apuestas cerradas';
+  } else if (!mia) {
+    btn.innerHTML = 'Armar mi ranking <small>· ' + pesos(c.apuestaInicial) + '</small>';
+  } else {
+    const quedan = c.maxModificaciones - mia.modificaciones;
+    if (quedan <= 0) { btn.disabled = true; btn.textContent = 'Ya no puedes modificar'; }
+    else btn.innerHTML = 'Modificar ranking <small>· −' + pesos(c.costoModificacion) + '</small>';
+  }
 
-        function renderBandas(bandas, nNorm) {
-            const c = document.getElementById('band-container'); c.innerHTML = '';
-            const f = bandas.filter(b => b.region.trim().toLowerCase() === app.region.trim().toLowerCase() && b.nivel.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === nNorm);
-            f.forEach(b => {
-                const bt = document.createElement('button');
-                bt.className = 'premium-card p-5 text-[11px] font-black uppercase leading-tight btn-banda-item active:scale-95 transition-all';
-                bt.innerText = b.nombre; 
-                bt.onclick = () => {
-                    const nNormActual = app.nivel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    const limite = LIMITES_NIVEL[nNormActual] || 3;
-                    if(!app.p1) app.p1 = b.nombre; 
-                    else if(!app.p2) app.p2 = b.nombre; 
-                    else if(!app.p3 && limite === 3) app.p3 = b.nombre;
-                    syncUI();
-                }; 
-                c.appendChild(bt);
-            });
-        }
+  if (mia) {
+    const quedan = Math.max(0, c.maxModificaciones - mia.modificaciones);
+    $('txt-mods').textContent = quedan === 1 ? 'Te queda 1 cambio' : 'Te quedan ' + quedan + ' cambios';
+    $('mods').innerHTML = '';
+    for (let i = 0; i < c.maxModificaciones; i++) {
+      const s = document.createElement('i');
+      if (i < mia.modificaciones) s.className = 'used';
+      $('mods').appendChild(s);
+    }
+  }
 
-        function syncUI() {
-            const nNorm = app.nivel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const limite = LIMITES_NIVEL[nNorm] || 3;
-            document.getElementById('txt-p1').innerText = app.p1 || 'VACÍO';
-            document.getElementById('txt-p2').innerText = app.p2 || 'VACÍO';
-            document.getElementById('txt-p3').innerText = app.p3 || 'VACÍO';
-            const podiumGrid = document.getElementById('podium-grid');
-            if (limite === 2) {
-                podiumGrid.classList.replace('grid-cols-3', 'grid-cols-2');
-                document.getElementById('slot-3').classList.add('hidden');
-                app.p3 = '';
-            } else {
-                podiumGrid.classList.replace('grid-cols-2', 'grid-cols-3');
-                document.getElementById('slot-3').classList.remove('hidden');
-            }
-            const picks = [app.p1, app.p2, app.p3].filter(p => p !== '');
-            document.querySelectorAll('.btn-banda-item').forEach(btn => {
-                if(picks.includes(btn.innerText)) btn.classList.add('band-disabled');
-                else btn.classList.remove('band-disabled');
-            });
-            for(let i=1; i<=3; i++) {
-                const slot = document.getElementById(`slot-${i}`);
-                if (slot) slot.className = `podium-slot flex-col p-2 text-center ${app['p'+i] ? 'slot-filled' : ''} ${i > limite ? 'hidden' : ''}`;
-            }
-        }
+  // Resultados (solo cuando el administrador los publica)
+  $('box-resultados').classList.toggle('hidden', !d.resultados);
+  if (d.resultados) {
+    pintarMini($('rank-oficial'), oficial, []);
+    const yo = d.resultados.tabla.find(t => t.esTuyo);
+    $('txt-aciertos').textContent = yo
+      ? 'Acertaste ' + yo.aciertos + ' de ' + oficial.length + ' posiciones exactas (en verde en tu tiquete).'
+      : 'No participaste en esta final.';
+    $('tabla').innerHTML = '';
+    d.resultados.tabla.forEach((t, i) => {
+      const li = document.createElement('li');
+      if (t.esTuyo) li.className = 'me';
+      const a = document.createElement('span'); a.textContent = (i + 1) + '. ' + t.nombre;
+      const b = document.createElement('span'); b.textContent = t.aciertos + ' aciertos';
+      li.append(a, b); $('tabla').appendChild(li);
+    });
+  }
 
-        function confirmarModificar(nivelLabel) {
-            const nNorm = nivelLabel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const d = cacheData[nNorm];
-            const edicionesActuales = d.miApuesta ? d.miApuesta.ediciones : 0;
-            const limiteEdiciones = configGlobal.config.limiteEdiciones || 3;
-            
-            if (edicionesActuales >= limiteEdiciones) {
-                document.getElementById('modal-title').innerText = "SIN INTENTOS";
-                document.getElementById('modal-text').innerText = "Ya has utilizado tus oportunidades de modificación.\n\nNo se permiten más cambios.";
-                document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
-                document.getElementById('btn-modal-ok').onclick = closeModal;
-                document.getElementById('btn-modal-cancel').classList.add('hidden');
-                document.getElementById('modal-confirm').classList.remove('hidden');
-                return;
-            }
-            
-            const costo = (configGlobal.config.costoEdicion || 1000).toLocaleString();
-            document.getElementById('modal-title').innerText = "ATENCIÓN";
-            document.getElementById('modal-text').innerText = `Vas a editar tu apuesta.\n\nIntento #${edicionesActuales + 1}.\nCosto: $${costo} que se descontará del pozo.`;
-            document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
-            document.getElementById('btn-modal-ok').onclick = () => { closeModal(); abrirNivel(nivelLabel); };
-            document.getElementById('btn-modal-cancel').classList.remove('hidden');
-            document.getElementById('modal-confirm').classList.remove('hidden');
-        }
+  // Reglas (se escriben con los valores de la hoja)
+  const reglas = [
+    ['Ordena las <b>' + d.bandas.length + ' bandas</b>', ' del puesto 1 al ' + d.bandas.length + '.'],
+    ['Tu apuesta vale <b>' + pesos(c.apuestaInicial) + '</b>', ' y suma al pozo.'],
+    ['Puedes modificarla <b>' + c.maxModificaciones + ' veces</b>', '. Cada cambio descuenta ' + pesos(c.costoModificacion) + ' de tu apuesta.'],
+    ['El pozo es la <b>suma de todas las apuestas</b>', ' vigentes.']
+  ];
+  $('reglas').innerHTML = reglas.map((r, i) => '<li><span class="n">' + (i + 1) + '</span><span>' + r[0] + r[1] + '</span></li>').join('');
+}
 
-        function removeBand(s) { app['p'+s] = ''; syncUI(); }
-        function cancelarPodium() { localStorage.removeItem('podium_nivel'); showView('view-dashboard'); }
+function pintarMini(ol, ranking, oficial) {
+  ol.innerHTML = '';
+  // Orden por columnas: 1-6 a la izquierda, 7-12 a la derecha
+  const mitad = Math.ceil(ranking.length / 2);
+  const orden = [];
+  for (let i = 0; i < mitad; i++) { orden.push(i); if (i + mitad < ranking.length) orden.push(i + mitad); }
+  orden.forEach(i => {
+    const li = document.createElement('li');
+    if (oficial[i] && oficial[i] === ranking[i]) li.className = 'hit';
+    const b = document.createElement('b'); b.textContent = i + 1;
+    const s = document.createElement('span'); s.textContent = ranking[i];
+    li.append(b, s);
+    if (i < 3) li.querySelector('b').style.color = ['var(--gold)', 'var(--silver)', 'var(--bronze)'][i];
+    ol.appendChild(li);
+  });
+  ol.classList.toggle('hidden', ranking.length === 0);
+}
 
-        function prepararConfirmación() {
-            const nNorm = app.nivel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const limite = LIMITES_NIVEL[nNorm] || 3;
-            const picks = [app.p1, app.p2, app.p3].filter(p => p !== '');
-            if(picks.length < limite) return alert(`COMPLETA LAS ${limite} POSICIONES`);
-            const uniquePicks = new Set(picks);
-            if(uniquePicks.size !== limite) return alert('BANDA REPETIDA EN EL PÓDIUM');
-            
-            const costoE = (configGlobal.config.costoEntrada || 20000).toLocaleString();
-            const costoEd = (configGlobal.config.costoEdicion || 1000).toLocaleString();
-            const limiteEd = configGlobal.config.limiteEdiciones || 3;
+/* =====================================================================
+   6) ARMAR EL RANKING
+   ===================================================================== */
+function abrirEditor() {
+  const mia = datos.miApuesta;
+  borrador = mia ? mia.ranking.slice() : Array(datos.bandas.length).fill(null);
+  $('txt-editor-eyebrow').textContent = mia
+    ? 'Modificación ' + (mia.modificaciones + 1) + ' de ' + datos.config.maxModificaciones
+    : 'Nueva apuesta · ' + pesos(datos.config.apuestaInicial);
+  pintarEditor();
+  mostrar('v-editor');
+  window.scrollTo(0, 0);
+}
 
-            document.getElementById('modal-title').innerText = "¿CONFIRMAR?";
-            document.getElementById('modal-text').innerText = app.existe ? `MODIFICAR COSTARÁ $${costoEd}.\nINTENTO: ${app.ediciones + 1} DE ${limiteEd}.` : `ESTA APUESTA TIENE UN VALOR DE $${costoE}.`;
-            document.getElementById('btn-modal-ok').innerText = "SÍ, ENVIAR";
-            document.getElementById('btn-modal-ok').onclick = execSave;
-            document.getElementById('btn-modal-cancel').classList.remove('hidden');
-            document.getElementById('modal-confirm').classList.remove('hidden');
-        }
+function cerrarEditor() { mostrar('v-inicio'); }
 
-        async function execSave() {
-            closeModal(); toggleLoader(true, "GUARDANDO...");
-            try {
-                const nNorm = app.nivel.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'saveApuesta', user, region: app.region, categoria: nNorm, p1: app.p1, p2: app.p2, p3: app.p3 }) });
-                alert('¡ÉXITO!');
-                localStorage.removeItem('podium_nivel');
-                await cargarDatosRegión(app.region); 
-            } catch(e) { alert('ERROR'); }
-            toggleLoader(false);
-        }
+function limpiar() { borrador = Array(datos.bandas.length).fill(null); pintarEditor(); }
 
-        async function handleLogin() {
-            const u = document.getElementById('login-user').value.trim();
-            const p = document.getElementById('login-pass').value.trim();
-            if(!u || !p) return;
-            toggleLoader(true, "AUTENTICANDO...");
-            try {
-                const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user: u, pass: p }) });
-                const d = await r.json();
-                if(d.success) {
-                    if(d.status === 'INACTIVO') {
-                        document.getElementById('modal-title').innerText = "CUENTA INACTIVA";
-                        document.getElementById('modal-text').innerText = "Tu usuario no se encuentra activo.\n\nComunícate con el administrador.";
-                        document.getElementById('btn-modal-ok').innerText = "ENTENDIDO";
-                        document.getElementById('btn-modal-ok').onclick = closeModal;
-                        document.getElementById('btn-modal-cancel').classList.add('hidden');
-                        document.getElementById('modal-confirm').classList.remove('hidden');
-                    } else {
-                        user = u; localStorage.setItem('podium_user', u); initApp();
-                    }
-                } else alert('DATOS INCORRECTOS.');
-            } catch(e) { alert('ERROR DE CONEXIÓN'); }
-            toggleLoader(false);
-        }
+function pintarEditor() {
+  const total = datos.bandas.length;
+  const siguiente = borrador.indexOf(null);
+  const lista = $('slots'); lista.innerHTML = '';
 
-        async function verEstadísticas(n) {
-            toggleLoader(true, "OBTENIENDO STATS...");
-            try {
-                const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getStats', region: app.region, nivel: n }) });
-                const d = await r.json();
-                let txt = d.stats.length > 0 ? d.stats.map(s => `- ${s.nombre}`).join('\n') : "- SIN DATOS -";
-                document.getElementById('modal-title').innerText = "ESTADÍSTICAS";
-                document.getElementById('modal-text').innerText = "LAS DOS BANDAS MÁS SELECCIONADAS:\n" + txt;
-                document.getElementById('btn-modal-ok').innerText = "CERRAR";
-                document.getElementById('btn-modal-ok').onclick = closeModal;
-                document.getElementById('btn-modal-cancel').classList.add('hidden');
-                document.getElementById('modal-confirm').classList.remove('hidden');
-            } catch(e) { alert('ERROR'); }
-            toggleLoader(false);
-        }
+  borrador.forEach((banda, i) => {
+    const li = document.createElement('li');
+    li.className = 'slot' + (banda ? '' : ' empty') + (i === siguiente ? ' next' : '');
+    li.innerHTML = '<span class="pos">' + (i + 1) + '</span><span class="name"></span>';
+    li.querySelector('.name').textContent = banda || (i === siguiente ? 'Aquí va la próxima que toques' : 'Vacío');
+    if (banda) {
+      const ctrls = document.createElement('div'); ctrls.className = 'ctrls';
+      ctrls.append(
+        boton('↑', () => mover(i, -1), i === 0),
+        boton('↓', () => mover(i, 1), i === total - 1),
+        boton('✕', () => { borrador[i] = null; pintarEditor(); }, false, 'x')
+      );
+      li.appendChild(ctrls);
+    }
+    lista.appendChild(li);
+  });
 
-        function closeModal() { document.getElementById('modal-confirm').classList.add('hidden'); document.getElementById('btn-modal-cancel').classList.remove('hidden'); }
-        function logout() { localStorage.clear(); location.reload(); }
-    </script>
+  const libres = datos.bandas.filter(b => !borrador.includes(b));
+  const pool = $('pool'); pool.innerHTML = '';
+  if (!libres.length) pool.innerHTML = '<p class="pool-empty">✓ Todas las bandas están ubicadas</p>';
+  libres.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'band'; el.textContent = b;
+    el.onclick = () => { const p = borrador.indexOf(null); if (p >= 0) { borrador[p] = b; pintarEditor(); } };
+    pool.appendChild(el);
+  });
+
+  const listos = total - libres.length;
+  $('txt-faltan').textContent = libres.length ? 'Faltan ' + libres.length : '';
+  $('txt-progreso').textContent = listos;
+  $('txt-total').textContent = '/ ' + total;
+  $('track').style.width = (listos / total * 100) + '%';
+  $('btn-confirmar').disabled = listos !== total;
+}
+
+function boton(txt, fn, off, extra) {
+  const b = document.createElement('button');
+  b.className = 'ic' + (extra ? ' ' + extra : ''); b.textContent = txt; b.disabled = off; b.onclick = fn;
+  return b;
+}
+
+function mover(i, dir) {
+  const j = i + dir;
+  [borrador[i], borrador[j]] = [borrador[j], borrador[i]];
+  pintarEditor();
+}
+
+/* =====================================================================
+   7) CONFIRMAR Y GUARDAR
+   ===================================================================== */
+function pedirConfirmacion() {
+  const c = datos.config, mia = datos.miApuesta;
+  if (mia && mia.ranking.join('|') === borrador.join('|')) {
+    return aviso('No has cambiado nada en tu ranking.');
+  }
+  if (!mia) {
+    modal('¿Confirmas tu apuesta?', 'Tu ranking queda registrado. Después podrás modificarlo hasta ' + c.maxModificaciones + ' veces, pero cada cambio descuenta ' + pesos(c.costoModificacion) + '.',
+      [['Valor de la apuesta', pesos(c.apuestaInicial)]],
+      [['Sí, apostar', enviar, 'btn-primary'], ['Revisar otra vez', cerrarModal, 'btn-ghost']]);
+  } else {
+    const nuevas = mia.modificaciones + 1;
+    const quedan = c.maxModificaciones - nuevas;
+    modal('¿Modificar tu apuesta?', quedan > 0
+        ? 'Después de esta te quedará ' + quedan + (quedan === 1 ? ' modificación.' : ' modificaciones.')
+        : 'Esta es tu última modificación. Después ya no podrás cambiar tu ranking.',
+      [['Apuesta actual', pesos(mia.valor)], ['Costo de modificar', '−' + pesos(c.costoModificacion)], ['Nueva apuesta', pesos(mia.valor - c.costoModificacion), true]],
+      [['Sí, modificar', enviar, 'btn-primary'], ['Cancelar', cerrarModal, 'btn-ghost']]);
+  }
+}
+
+async function enviar() {
+  cerrarModal(); cargando(true);
+  try {
+    const eraNueva = !datos.miApuesta;
+    datos = await llamar('guardar', { ranking: borrador });
+    pintarInicio();
+    mostrar('v-inicio');
+    window.scrollTo(0, 0);
+    aviso(eraNueva ? '¡Apuesta registrada!' : 'Ranking modificado', true);
+  } catch (e) {
+    aviso(mensajeError(e));
+  }
+  cargando(false);
+}
+
+/* =====================================================================
+   8) PIEZAS DE INTERFAZ
+   ===================================================================== */
+function mostrar(id) {
+  ['v-login', 'v-inicio', 'v-editor'].forEach(v => $(v).classList.toggle('hidden', v !== id));
+}
+
+function cargando(si) { $('loader').classList.toggle('hidden', !si); }
+
+let tToast;
+function aviso(texto, bueno) {
+  const t = $('toast');
+  t.textContent = texto; t.className = 'toast' + (bueno ? ' good' : '');
+  clearTimeout(tToast); tToast = setTimeout(() => t.classList.add('hidden'), 3500);
+}
+
+function modal(titulo, texto, cuentas, acciones) {
+  $('modal-titulo').textContent = titulo;
+  $('modal-texto').textContent = texto;
+  const box = $('modal-cuentas');
+  box.innerHTML = ''; box.classList.toggle('hidden', !cuentas.length);
+  cuentas.forEach(([k, v, total]) => {
+    const row = document.createElement('div'); if (total) row.className = 'total';
+    const a = document.createElement('span'); a.textContent = k;
+    const b = document.createElement('span'); b.textContent = v;
+    row.append(a, b); box.appendChild(row);
+  });
+  const acc = $('modal-acciones'); acc.innerHTML = '';
+  acciones.forEach(([txt, fn, cls]) => {
+    const b = document.createElement('button'); b.className = 'btn ' + cls; b.textContent = txt; b.onclick = fn; acc.appendChild(b);
+  });
+  $('modal').classList.remove('hidden');
+}
+function cerrarModal() { $('modal').classList.add('hidden'); }
+
+/* =====================================================================
+   9) MODO DEMO (datos de mentira para probar sin tocar la hoja)
+   ===================================================================== */
+const demo = {
+  bandas: ['Sonora Cafetera', 'Brisas del Cauca', 'La Murga del Barrio', 'Tambores de Guadua', 'Los del Altiplano', 'Viento Andino',
+           'Banda La Quebrada', 'Cumbia de Ladera', 'Orquesta Niebla', 'Son de Montaña', 'Raíces del Río', 'Colectivo Bambuco'],
+  config: { abierta: true, apuestaInicial: 20000, costoModificacion: 1000, maxModificaciones: 2 },
+  otras: [20000, 19000, 20000, 18000, 20000, 20000, 19000],
+  mia: null
+};
+async function demoApi(p) {
+  await new Promise(r => setTimeout(r, 350));
+  if (String(p.user).toLowerCase() !== 'demo' || p.pass !== 'demo') return { ok: false, error: 'En modo demo usa usuario demo y contraseña demo.' };
+  if (p.accion === 'guardar') {
+    if (!demo.mia) demo.mia = { ranking: p.ranking.slice(), modificaciones: 0, valor: demo.config.apuestaInicial };
+    else {
+      if (demo.mia.modificaciones >= demo.config.maxModificaciones) return { ok: false, error: 'Ya usaste tus modificaciones.' };
+      demo.mia.modificaciones++;
+      demo.mia.valor = demo.config.apuestaInicial - demo.mia.modificaciones * demo.config.costoModificacion;
+      demo.mia.ranking = p.ranking.slice();
+    }
+  }
+  const valores = demo.otras.concat(demo.mia ? [demo.mia.valor] : []);
+  return {
+    ok: true, usuario: { nombre: 'Invitado Demo' }, config: demo.config, bandas: demo.bandas,
+    miApuesta: demo.mia ? JSON.parse(JSON.stringify(demo.mia)) : null,
+    pozo: valores.reduce((a, b) => a + b, 0), apostadores: valores.length, resultados: null
+  };
+}
+
+/* =====================================================================
+   10) ARRANQUE
+   ===================================================================== */
+if (DEMO) { const b = document.createElement('div'); b.className = 'demo-badge'; b.textContent = 'MODO DEMO'; document.body.appendChild(b); }
+if (sesion) cargar(); else mostrar('v-login');
+</script>
 </body>
 </html>
