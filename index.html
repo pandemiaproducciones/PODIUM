@@ -455,7 +455,7 @@ function pintarInicio() {
     }
     const yoT = tabla.find(t => t.esTuyo);
     $('txt-aciertos').textContent = yoT
-      ? 'Acertaste ' + yoT.top + ' de los ' + N + ' primeros puestos (' + yoT.total + ' de ' + oficial.length + ' en total, en verde en tu tiquete).'
+      ? 'Acertaste ' + yoT.top + ' de los ' + N + ' primeros puestos' + (oficial.length > N ? ' (' + yoT.total + ' de ' + oficial.length + ' en total)' : '') + '. Tus aciertos aparecen en verde en tu tiquete.'
       : 'No participaste en esta final.';
 
     $('tabla').innerHTML = '';
