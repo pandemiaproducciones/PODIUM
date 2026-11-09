@@ -433,8 +433,11 @@ function pintarInicio() {
     // Los ganadores se reparten en partes iguales el pozo menos la comisión de la app.
     const N = c.puestosPremiados;
     const tabla = d.resultados.tabla.map(t => {
-      const top = t.puestos.slice(0, N).filter(Boolean).length;
-      return Object.assign({}, t, { top, total: t.puestos.filter(Boolean).length, gana: top === N && oficial.length >= N });
+      // Si el cerebro envía la lista de puestos acertados se usa; si solo envía el número de aciertos, se usa ese número.
+      const lista = Array.isArray(t.puestos) ? t.puestos : null;
+      const top = lista ? lista.slice(0, N).filter(Boolean).length : Math.min(Number(t.aciertos) || 0, N);
+      const total = lista ? lista.filter(Boolean).length : (Number(t.aciertos) || 0);
+      return Object.assign({}, t, { top, total, gana: top === N && oficial.length >= N });
     }).sort((x, y) => (y.top - x.top) || (y.total - x.total));
     const ganadores = tabla.filter(t => t.gana);
     const comision = Math.round(d.pozo * c.comision);
